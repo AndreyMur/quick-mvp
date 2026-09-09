@@ -43,7 +43,7 @@
 - **Tabs layout** — изменена ориентация на `flex-col` (вкладки сверху, контент снизу)
 
 ### Ключевые артефакты:
-- **БД:** Полная схема в `supabase/migrations/001_initial_schema.sql` (9 таблиц, RLS, триггеры, сиды)
+- **БД:** Полная схема в `supabase/migrations/001_initial_schema.sql` (8 таблиц, RLS, триггеры, сиды)
 - **Supabase:** client.ts + server.ts + database.types.ts
 - **Auth:** AuthContext, SignInForm, SignUpForm, SignOutButton, middleware с защитой маршрутов
 - **API:** /api/user/profile, /api/user/limits, /api/projects, /api/projects/[id], /api/custom-services, /api/calculate, /api/export/pdf, /api/admin/users, /api/admin/settings/global
@@ -73,7 +73,7 @@
 ### [x] Задача 1.3: Подключение Supabase
 **DoD:** Установлен Supabase JS Client; настроены переменные окружения (SUPABASE_URL, SUPABASE_ANON_KEY); создан Supabase проект с таблицами из ТЗ (profiles, projects, global_rates, global_service_hours, user_rates, user_service_hours, custom_services, technology_coefficients); настроены RLS политики согласно разделу 5.9 ТЗ.
 **Зависимости:** 1.1
-**Статус:** ✅ Выполнено — @supabase/supabase-js + @supabase/ssr, client.ts + server.ts, полная схема БД (9 таблиц) в 001_initial_schema.sql, RLS политики, триггеры, начальные данные
+**Статус:** ✅ Выполнено — @supabase/supabase-js + @supabase/ssr, client.ts + server.ts, полная схема БД (8 таблиц) в 001_initial_schema.sql, RLS политики, триггеры, начальные данные
 
 ### [x] Задача 1.4: Настройка интернационализации (next-intl)
 **DoD:** Установлен next-intl; настроена русская локаль (locales/ru/common.json); все строки в коде получаются через useTranslations; архитектура готова к добавлению новых языков.
@@ -348,7 +348,7 @@
 
 | Файл/Модуль | Роль в плане |
 |-------------|-------------|
-| doc.md (ТЗ) | Основной источник требований: 10 модулей, 9 таблиц БД, 17 API эндпоинтов, алгоритм расчёта |
+| doc.md (ТЗ) | Основной источник требований: 10 модулей, 8 таблиц БД, 17 API эндпоинтов, алгоритм расчёта |
 | agents/planner.md | Определение подхода к декомпозиции: vertical slices, 5-15 задач, DoD, критический путь |
 | Next.js 14+ App Router | Структура маршрутов и серверных компонентов |
 | Supabase (PostgreSQL + Auth + Storage) | Аутентификация, БД, RLS, хранение файлов |
