@@ -16,25 +16,25 @@ export default function Home() {
       <section className="flex-1">
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Узнайте бюджет и сроки MVP
+            РЈР·РЅР°Р№С‚Рµ Р±СЋРґР¶РµС‚ Рё СЃСЂРѕРєРё MVP
             <br />
-            <span className="text-primary">до начала разработки</span>
+            <span className="text-primary">РґРѕ РЅР°С‡Р°Р»Р° СЂР°Р·СЂР°Р±РѕС‚РєРё</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Пошаговый конструктор расчёта стоимости цифровых продуктов.
-            Рассчитайте стоимость и сроки создания MVP за 5 минут.
+            РџРѕС€Р°РіРѕРІС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЂР°СЃС‡С‘С‚Р° СЃС‚РѕРёРјРѕСЃС‚Рё С†РёС„СЂРѕРІС‹С… РїСЂРѕРґСѓРєС‚РѕРІ.
+            Р Р°СЃСЃС‡РёС‚Р°Р№С‚Рµ СЃС‚РѕРёРјРѕСЃС‚СЊ Рё СЃСЂРѕРєРё СЃРѕР·РґР°РЅРёСЏ MVP Р·Р° 5 РјРёРЅСѓС‚.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {user ? (
               <Link href="/projects/new">
                 <Button size="lg" className="text-lg px-8">
-                  Создать проект
+                  РЎРѕР·РґР°С‚СЊ РїСЂРѕРµРєС‚
                 </Button>
               </Link>
             ) : (
               <Link href="/register">
                 <Button size="lg" className="text-lg px-8">
-                  Попробовать бесплатно
+                  РџРѕРїСЂРѕР±РѕРІР°С‚СЊ Р±РµСЃРїР»Р°С‚РЅРѕ
                 </Button>
               </Link>
             )}
@@ -45,34 +45,34 @@ export default function Home() {
       <section id="benefits" className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">
-            Почему MVP Calculator?
+            РџРѕС‡РµРјСѓ MVP Calculator?
           </h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-background rounded-lg p-6 border text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
                 <Clock className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Экономия времени</h3>
+              <h3 className="text-xl font-semibold mb-2">Р­РєРѕРЅРѕРјРёСЏ РІСЂРµРјРµРЅРё</h3>
               <p className="text-muted-foreground">
-                Расчёт за минуты вместо недель оценки
+                Р Р°СЃС‡С‘С‚ Р·Р° РјРёРЅСѓС‚С‹ РІРјРµСЃС‚Рѕ РЅРµРґРµР»СЊ РѕС†РµРЅРєРё
               </p>
             </div>
             <div className="bg-background rounded-lg p-6 border text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
                 <Target className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Точность оценки</h3>
+              <h3 className="text-xl font-semibold mb-2">РўРѕС‡РЅРѕСЃС‚СЊ РѕС†РµРЅРєРё</h3>
               <p className="text-muted-foreground">
-                Нормативы на основе реальных проектов
+                РќРѕСЂРјР°С‚РёРІС‹ РЅР° РѕСЃРЅРѕРІРµ СЂРµР°Р»СЊРЅС‹С… РїСЂРѕРµРєС‚РѕРІ
               </p>
             </div>
             <div className="bg-background rounded-lg p-6 border text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
                 <BarChart3 className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Прозрачность</h3>
+              <h3 className="text-xl font-semibold mb-2">РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ</h3>
               <p className="text-muted-foreground">
-                Детальная смета по ролям и сервисам
+                Р”РµС‚Р°Р»СЊРЅР°СЏ СЃРјРµС‚Р° РїРѕ СЂРѕР»СЏРј Рё СЃРµСЂРІРёСЃР°Рј
               </p>
             </div>
           </div>
@@ -82,20 +82,20 @@ export default function Home() {
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2026 MVP Calculator. Все права защищены.
+            В© 2026 MVP Calculator. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.
           </p>
           <div className="flex gap-6">
             <a
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground transition"
             >
-              Политика конфиденциальности
+              РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё
             </a>
             <a
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground transition"
             >
-              Условия использования
+              РЈСЃР»РѕРІРёСЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
             </a>
           </div>
         </div>

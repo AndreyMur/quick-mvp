@@ -14,9 +14,9 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 const signUpSchema = z.object({
-  fullName: z.string().min(2, "Минимум 2 символа").optional(),
-  email: z.string().email("Некорректный email"),
-  password: z.string().min(6, "Минимум 6 символов"),
+  fullName: z.string().min(2, "РњРёРЅРёРјСѓРј 2 СЃРёРјРІРѕР»Р°").optional(),
+  email: z.string().email("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ email"),
+  password: z.string().min(6, "РњРёРЅРёРјСѓРј 6 СЃРёРјРІРѕР»РѕРІ"),
 });
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
@@ -53,11 +53,11 @@ export function SignUpForm() {
       }
 
       toast.success(
-        "Регистрация успешна! Проверьте email для подтверждения."
+        "Р РµРіРёСЃС‚СЂР°С†РёСЏ СѓСЃРїРµС€РЅР°! РџСЂРѕРІРµСЂСЊС‚Рµ email РґР»СЏ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ."
       );
       router.push("/login");
     } catch {
-      toast.error("Произошла ошибка при регистрации");
+      toast.error("РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё");
     } finally {
       setLoading(false);
     }
@@ -66,19 +66,19 @@ export function SignUpForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Регистрация</CardTitle>
+        <CardTitle>Р РµРіРёСЃС‚СЂР°С†РёСЏ</CardTitle>
         <CardDescription>
-          Создайте аккаунт для начала работы
+          РЎРѕР·РґР°Р№С‚Рµ Р°РєРєР°СѓРЅС‚ РґР»СЏ РЅР°С‡Р°Р»Р° СЂР°Р±РѕС‚С‹
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Имя</Label>
+            <Label htmlFor="fullName">РРјСЏ</Label>
             <Input
               id="fullName"
               type="text"
-              placeholder="Иван Иванов"
+              placeholder="РРІР°РЅ РРІР°РЅРѕРІ"
               {...register("fullName")}
               disabled={loading}
             />
@@ -102,11 +102,11 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
+            <Label htmlFor="password">РџР°СЂРѕР»СЊ</Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="вЂўвЂўвЂўвЂўвЂўвЂўвЂўвЂў"
               {...register("password")}
               disabled={loading}
             />
@@ -116,13 +116,13 @@ export function SignUpForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Регистрируем..." : "Зарегистрироваться"}
+            {loading ? "Р РµРіРёСЃС‚СЂРёСЂСѓРµРј..." : "Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ"}
           </Button>
 
           <p className="text-sm text-center text-muted-foreground">
-            Уже есть аккаунт?{" "}
+            РЈР¶Рµ РµСЃС‚СЊ Р°РєРєР°СѓРЅС‚?{" "}
             <Link href="/login" className="text-primary hover:underline">
-              Войти
+              Р’РѕР№С‚Рё
             </Link>
           </p>
         </form>

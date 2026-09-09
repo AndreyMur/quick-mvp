@@ -14,8 +14,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 const signInSchema = z.object({
-  email: z.string().email("Некорректный email"),
-  password: z.string().min(6, "Минимум 6 символов"),
+  email: z.string().email("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ email"),
+  password: z.string().min(6, "РњРёРЅРёРјСѓРј 6 СЃРёРјРІРѕР»РѕРІ"),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
@@ -46,11 +46,11 @@ export function SignInForm() {
         return;
       }
 
-      toast.success("Вход выполнен");
+      toast.success("Р’С…РѕРґ РІС‹РїРѕР»РЅРµРЅ");
       router.push("/dashboard");
       router.refresh();
     } catch {
-      toast.error("Произошла ошибка при входе");
+      toast.error("РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РІС…РѕРґРµ");
     } finally {
       setLoading(false);
     }
@@ -59,9 +59,9 @@ export function SignInForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Вход</CardTitle>
+        <CardTitle>Р’С…РѕРґ</CardTitle>
         <CardDescription>
-          Введите email и пароль для входа в аккаунт
+          Р’РІРµРґРёС‚Рµ email Рё РїР°СЂРѕР»СЊ РґР»СЏ РІС…РѕРґР° РІ Р°РєРєР°СѓРЅС‚
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,11 +81,11 @@ export function SignInForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
+            <Label htmlFor="password">РџР°СЂРѕР»СЊ</Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="вЂўвЂўвЂўвЂўвЂўвЂўвЂўвЂў"
               {...register("password")}
               disabled={loading}
             />
@@ -95,13 +95,13 @@ export function SignInForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Входим..." : "Войти"}
+            {loading ? "Р’С…РѕРґРёРј..." : "Р’РѕР№С‚Рё"}
           </Button>
 
           <p className="text-sm text-center text-muted-foreground">
-            Нет аккаунта?{" "}
+            РќРµС‚ Р°РєРєР°СѓРЅС‚Р°?{" "}
             <Link href="/register" className="text-primary hover:underline">
-              Зарегистрироваться
+              Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ
             </Link>
           </p>
         </form>

@@ -11,16 +11,16 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const serviceLabels: Record<string, string> = {
-  authentication: "Аутентификация",
-  personal_cabinet: "Личный кабинет",
-  payment_system: "Платёжная система",
-  chat_basic: "Чат (базовый)",
-  admin_panel: "Админ-панель",
-  notifications: "Уведомления",
-  file_upload: "Загрузка файлов",
-  analytics: "Аналитика",
-  social_integration: "Интеграция с соцсетями",
-  search: "Поиск",
+  authentication: "РђСѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ",
+  personal_cabinet: "Р›РёС‡РЅС‹Р№ РєР°Р±РёРЅРµС‚",
+  payment_system: "РџР»Р°С‚С‘Р¶РЅР°СЏ СЃРёСЃС‚РµРјР°",
+  chat_basic: "Р§Р°С‚ (Р±Р°Р·РѕРІС‹Р№)",
+  admin_panel: "РђРґРјРёРЅ-РїР°РЅРµР»СЊ",
+  notifications: "РЈРІРµРґРѕРјР»РµРЅРёСЏ",
+  file_upload: "Р—Р°РіСЂСѓР·РєР° С„Р°Р№Р»РѕРІ",
+  analytics: "РђРЅР°Р»РёС‚РёРєР°",
+  social_integration: "РРЅС‚РµРіСЂР°С†РёСЏ СЃ СЃРѕС†СЃРµС‚СЏРјРё",
+  search: "РџРѕРёСЃРє",
 };
 
 const techLabels: Record<string, string> = {
@@ -74,7 +74,7 @@ export function StepSummary() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || "Ошибка при сохранении проекта");
+      throw new Error(err.error || "РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё РїСЂРѕРµРєС‚Р°");
     }
   };
 
@@ -99,14 +99,14 @@ export function StepSummary() {
 
     if (!createRes.ok) {
       const err = await createRes.json().catch(() => ({}));
-      throw new Error(err.error || "Ошибка при создании проекта");
+      throw new Error(err.error || "РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё РїСЂРѕРµРєС‚Р°");
     }
 
     const created = await createRes.json();
     const projectId = created.project?.id as string | undefined;
 
     if (!projectId) {
-      throw new Error("Не удалось получить ID проекта");
+      throw new Error("РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ ID РїСЂРѕРµРєС‚Р°");
     }
 
     await saveProjectDraft(projectId);
@@ -128,16 +128,16 @@ export function StepSummary() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при расчёте");
+        toast.error(err.error || "РћС€РёР±РєР° РїСЂРё СЂР°СЃС‡С‘С‚Рµ");
         return;
       }
 
       const projectId = await ensureProjectId();
-      toast.success("Расчёт выполнен! Переход на страницу результата...");
+      toast.success("Р Р°СЃС‡С‘С‚ РІС‹РїРѕР»РЅРµРЅ! РџРµСЂРµС…РѕРґ РЅР° СЃС‚СЂР°РЅРёС†Сѓ СЂРµР·СѓР»СЊС‚Р°С‚Р°...");
       router.push(`/projects/${projectId}/result`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Ошибка при расчёте"
+        error instanceof Error ? error.message : "РћС€РёР±РєР° РїСЂРё СЂР°СЃС‡С‘С‚Рµ"
       );
     } finally {
       setCalculating(false);
@@ -147,9 +147,9 @@ export function StepSummary() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Саммари и расчёт</h2>
+        <h2 className="text-2xl font-bold mb-2">РЎР°РјРјР°СЂРё Рё СЂР°СЃС‡С‘С‚</h2>
         <p className="text-muted-foreground">
-          Проверьте параметры проекта и нажмите «Рассчитать»
+          РџСЂРѕРІРµСЂСЊС‚Рµ РїР°СЂР°РјРµС‚СЂС‹ РїСЂРѕРµРєС‚Р° Рё РЅР°Р¶РјРёС‚Рµ В«Р Р°СЃСЃС‡РёС‚Р°С‚СЊВ»
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export function StepSummary() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Сервисы</CardTitle>
+          <CardTitle className="text-base">РЎРµСЂРІРёСЃС‹</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
@@ -175,32 +175,32 @@ export function StepSummary() {
             ))}
           </div>
           {selectedServices.length === 0 && (
-            <p className="text-sm text-muted-foreground">Не выбрано</p>
+            <p className="text-sm text-muted-foreground">РќРµ РІС‹Р±СЂР°РЅРѕ</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Технологии</CardTitle>
+          <CardTitle className="text-base">РўРµС…РЅРѕР»РѕРіРёРё</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Фронтенд: </span>
+              <span className="text-muted-foreground">Р¤СЂРѕРЅС‚РµРЅРґ: </span>
               <span>{techLabels[technology.frontend] || technology.frontend}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Бэкенд: </span>
+              <span className="text-muted-foreground">Р‘СЌРєРµРЅРґ: </span>
               <span>{techLabels[technology.backend] || technology.backend}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">База данных: </span>
+              <span className="text-muted-foreground">Р‘Р°Р·Р° РґР°РЅРЅС‹С…: </span>
               <span>{techLabels[technology.database] || technology.database}</span>
             </div>
             {technology.mobile && (
               <div>
-                <span className="text-muted-foreground">Мобильная: </span>
+                <span className="text-muted-foreground">РњРѕР±РёР»СЊРЅР°СЏ: </span>
                 <span>{techLabels[technology.mobile] || technology.mobile}</span>
               </div>
             )}
@@ -210,7 +210,7 @@ export function StepSummary() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Команда</CardTitle>
+          <CardTitle className="text-base">РљРѕРјР°РЅРґР°</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -224,7 +224,7 @@ export function StepSummary() {
               </div>
             ))}
             {activeRoles.length === 0 && (
-              <p className="text-sm text-muted-foreground">Не выбрано</p>
+              <p className="text-sm text-muted-foreground">РќРµ РІС‹Р±СЂР°РЅРѕ</p>
             )}
           </div>
         </CardContent>
@@ -241,10 +241,10 @@ export function StepSummary() {
         {calculating ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Рассчитываем...
+            Р Р°СЃСЃС‡РёС‚С‹РІР°РµРј...
           </>
         ) : (
-          "Рассчитать"
+          "Р Р°СЃСЃС‡РёС‚Р°С‚СЊ"
         )}
       </Button>
     </div>

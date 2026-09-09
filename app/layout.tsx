@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MVP Calculator",
-  description: "Рассчитайте стоимость и сроки создания MVP за 5 минут",
+  description: "Р Р°СЃСЃС‡РёС‚Р°Р№С‚Рµ СЃС‚РѕРёРјРѕСЃС‚СЊ Рё СЃСЂРѕРєРё СЃРѕР·РґР°РЅРёСЏ MVP Р·Р° 5 РјРёРЅСѓС‚",
 };
 
 export default function RootLayout({
