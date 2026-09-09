@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { updateUserSchema } from "@/lib/validations/admin";
 
 async function checkAdmin() {
@@ -116,8 +117,8 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const check = await checkAdmin();
   if (check.error) return check.error;
-  const { supabase, user } = check;
-  if (!supabase || !user) return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  const { user } = check;
+  if (!user) return NextResponse.json({ error: "Internal error" }, { status: 500 });
 
   const url = new URL(request.url);
   const targetUserId = url.searchParams.get("id");
@@ -131,11 +132,12 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "Нельзя удалить себя" }, { status: 400 });
   }
 
-  // Delete from profiles (auth user remains, will be cleaned up later)
-  const { error } = await supabase
-    .from("profiles")
-    .delete()
-    .eq("id", targetUserId);
+  // Delete the user record from auth.users using the service-role client.
+  // profiles, projects, user_rates, user_service_hours and custom_services
+  // reference auth.users/profiles with ON DELETE CASCADE, so the whole
+  // graph is removed atomically in the same DB transaction.
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.deleteUser(targetUserId);
 
   if (error) {
     console.error("Error deleting user:", error);
