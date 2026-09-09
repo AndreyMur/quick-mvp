@@ -9,11 +9,11 @@ import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import Link from "next/link";
 
 const stepLabels = [
-  "Описание",
-  "Сервисы",
-  "Технологии",
-  "Команда",
-  "Саммари",
+  "РћРїРёСЃР°РЅРёРµ",
+  "РЎРµСЂРІРёСЃС‹",
+  "РўРµС…РЅРѕР»РѕРіРёРё",
+  "РљРѕРјР°РЅРґР°",
+  "РЎР°РјРјР°СЂРё",
 ];
 
 interface WizardLayoutProps {
@@ -89,17 +89,17 @@ export function WizardLayout({ children }: WizardLayoutProps) {
           {currentStep > 1 ? (
             <Button variant="outline" onClick={prevStep} className="gap-2">
               <ChevronLeft className="h-4 w-4" />
-              Назад
+              РќР°Р·Р°Рґ
             </Button>
           ) : (
             <Link href="/dashboard">
-              <Button variant="outline">Отмена</Button>
+              <Button variant="outline">РћС‚РјРµРЅР°</Button>
             </Link>
           )}
 
           {currentStep < totalSteps ? (
             <Button onClick={handleNext} disabled={!canGoNext} className="gap-2">
-              Далее
+              Р”Р°Р»РµРµ
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (

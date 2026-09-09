@@ -17,48 +17,48 @@ interface Limits {
 
 const tiers = [
   {
-    name: "Бесплатный",
+    name: "Р‘РµСЃРїР»Р°С‚РЅС‹Р№",
     key: "free",
     price: "0",
-    description: "Для знакомства с продуктом",
+    description: "Р”Р»СЏ Р·РЅР°РєРѕРјСЃС‚РІР° СЃ РїСЂРѕРґСѓРєС‚РѕРј",
     features: [
-      { text: "3 проекта", included: true },
-      { text: "До 2 кастомных сервисов", included: true },
-      { text: "Все базовые функции расчёта", included: true },
-      { text: "Экспорт в PDF", included: true },
-      { text: "Водяной знак в PDF", included: false },
+      { text: "3 РїСЂРѕРµРєС‚Р°", included: true },
+      { text: "Р”Рѕ 2 РєР°СЃС‚РѕРјРЅС‹С… СЃРµСЂРІРёСЃРѕРІ", included: true },
+      { text: "Р’СЃРµ Р±Р°Р·РѕРІС‹Рµ С„СѓРЅРєС†РёРё СЂР°СЃС‡С‘С‚Р°", included: true },
+      { text: "Р­РєСЃРїРѕСЂС‚ РІ PDF", included: true },
+      { text: "Р’РѕРґСЏРЅРѕР№ Р·РЅР°Рє РІ PDF", included: false },
     ],
-    cta: "Текущий тариф",
+    cta: "РўРµРєСѓС‰РёР№ С‚Р°СЂРёС„",
     ctaActive: true,
   },
   {
-    name: "Профессиональный",
+    name: "РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅС‹Р№",
     key: "pro",
     price: "99",
-    description: "Для фрилансеров и небольших команд",
+    description: "Р”Р»СЏ С„СЂРёР»Р°РЅСЃРµСЂРѕРІ Рё РЅРµР±РѕР»СЊС€РёС… РєРѕРјР°РЅРґ",
     features: [
-      { text: "20 проектов", included: true },
-      { text: "Безлимитные кастомные сервисы", included: true },
-      { text: "Без водяного знака", included: true },
-      { text: "Приоритетная поддержка", included: true },
-      { text: "Командный доступ", included: false },
+      { text: "20 РїСЂРѕРµРєС‚РѕРІ", included: true },
+      { text: "Р‘РµР·Р»РёРјРёС‚РЅС‹Рµ РєР°СЃС‚РѕРјРЅС‹Рµ СЃРµСЂРІРёСЃС‹", included: true },
+      { text: "Р‘РµР· РІРѕРґСЏРЅРѕРіРѕ Р·РЅР°РєР°", included: true },
+      { text: "РџСЂРёРѕСЂРёС‚РµС‚РЅР°СЏ РїРѕРґРґРµСЂР¶РєР°", included: true },
+      { text: "РљРѕРјР°РЅРґРЅС‹Р№ РґРѕСЃС‚СѓРї", included: false },
     ],
-    cta: "Скоро",
+    cta: "РЎРєРѕСЂРѕ",
     ctaActive: false,
   },
   {
-    name: "Бизнес",
+    name: "Р‘РёР·РЅРµСЃ",
     key: "business",
     price: "299",
-    description: "Для крупных организаций",
+    description: "Р”Р»СЏ РєСЂСѓРїРЅС‹С… РѕСЂРіР°РЅРёР·Р°С†РёР№",
     features: [
-      { text: "Безлимитные проекты", included: true },
-      { text: "Безлимитные кастомные сервисы", included: true },
-      { text: "Без водяного знака", included: true },
-      { text: "Командный доступ", included: true },
-      { text: "API-доступ", included: true },
+      { text: "Р‘РµР·Р»РёРјРёС‚РЅС‹Рµ РїСЂРѕРµРєС‚С‹", included: true },
+      { text: "Р‘РµР·Р»РёРјРёС‚РЅС‹Рµ РєР°СЃС‚РѕРјРЅС‹Рµ СЃРµСЂРІРёСЃС‹", included: true },
+      { text: "Р‘РµР· РІРѕРґСЏРЅРѕРіРѕ Р·РЅР°РєР°", included: true },
+      { text: "РљРѕРјР°РЅРґРЅС‹Р№ РґРѕСЃС‚СѓРї", included: true },
+      { text: "API-РґРѕСЃС‚СѓРї", included: true },
     ],
-    cta: "Скоро",
+    cta: "РЎРєРѕСЂРѕ",
     ctaActive: false,
   },
 ];
@@ -91,14 +91,14 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1 container mx-auto py-10 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Тарифы</h1>
+          <h1 className="text-4xl font-bold mb-4">РўР°СЂРёС„С‹</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Выберите подходящий тариф для вашего проекта
+            Р’С‹Р±РµСЂРёС‚Рµ РїРѕРґС…РѕРґСЏС‰РёР№ С‚Р°СЂРёС„ РґР»СЏ РІР°С€РµРіРѕ РїСЂРѕРµРєС‚Р°
           </p>
           {limits && (
             <p className="text-sm text-muted-foreground mt-4">
-              Текущий тариф: <Badge variant="secondary" className="capitalize">{limits.subscription_tier}</Badge>
-              {" "}· Создано {limits.projects_used} из {limits.project_limit} проектов
+              РўРµРєСѓС‰РёР№ С‚Р°СЂРёС„: <Badge variant="secondary" className="capitalize">{limits.subscription_tier}</Badge>
+              {" "}В· РЎРѕР·РґР°РЅРѕ {limits.projects_used} РёР· {limits.project_limit} РїСЂРѕРµРєС‚РѕРІ
             </p>
           )}
         </div>
@@ -120,7 +120,7 @@ export default function PricingPage() {
                   }`}
                 >
                   {isCurrent && (
-                    <Badge className="absolute -top-3 left-4">Текущий тариф</Badge>
+                    <Badge className="absolute -top-3 left-4">РўРµРєСѓС‰РёР№ С‚Р°СЂРёС„</Badge>
                   )}
                   <CardHeader>
                     <CardTitle className="text-xl">{tier.name}</CardTitle>
@@ -130,7 +130,7 @@ export default function PricingPage() {
                     <div className="mb-6">
                       <span className="text-4xl font-bold">{tier.price}</span>
                       {tier.price !== "0" && (
-                        <span className="text-muted-foreground ml-1">у.е./мес</span>
+                        <span className="text-muted-foreground ml-1">Сѓ.Рµ./РјРµСЃ</span>
                       )}
                     </div>
                     <ul className="space-y-3">

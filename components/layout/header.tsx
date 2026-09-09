@@ -20,9 +20,9 @@ import { useState } from "react";
 import { useTheme } from "next-themes";
 
 const navLinks = [
-  { href: "/dashboard", label: "Дашборд", icon: LayoutDashboard },
-  { href: "/settings", label: "Настройки", icon: Settings },
-  { href: "/pricing", label: "Тарифы", icon: Store },
+  { href: "/dashboard", label: "Р”Р°С€Р±РѕСЂРґ", icon: LayoutDashboard },
+  { href: "/settings", label: "РќР°СЃС‚СЂРѕР№РєРё", icon: Settings },
+  { href: "/pricing", label: "РўР°СЂРёС„С‹", icon: Store },
 ];
 
 export function Header() {
@@ -67,7 +67,7 @@ export function Header() {
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Shield className="h-4 w-4" />
-              Админ
+              РђРґРјРёРЅ
             </Link>
           )}
         </nav>
@@ -80,7 +80,7 @@ export function Header() {
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Переключить тему</span>
+            <span className="sr-only">РџРµСЂРµРєР»СЋС‡РёС‚СЊ С‚РµРјСѓ</span>
           </Button>
 
           {loading ? (
@@ -91,7 +91,7 @@ export function Header() {
             </div>
           ) : (
             <Link href="/login" className="hidden md:block">
-              <Button>Войти</Button>
+              <Button>Р’РѕР№С‚Рё</Button>
             </Link>
           )}
 
@@ -138,12 +138,12 @@ export function Header() {
               className="flex items-center gap-3 text-sm text-muted-foreground"
             >
               <Shield className="h-4 w-4" />
-              Админ-панель
+              РђРґРјРёРЅ-РїР°РЅРµР»СЊ
             </Link>
           )}
           {!loading && !user && (
             <Link href="/login" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full">Войти</Button>
+              <Button className="w-full">Р’РѕР№С‚Рё</Button>
             </Link>
           )}
           {!loading && user && <SignOutButton />}
