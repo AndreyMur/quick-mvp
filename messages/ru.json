@@ -1,0 +1,122 @@
+{
+  "common": {
+    "appName": "MVP Calculator",
+    "tagline": "Рассчитайте стоимость и сроки создания MVP за 5 минут",
+    "login": "Войти",
+    "logout": "Выйти",
+    "register": "Регистрация",
+    "dashboard": "Дашборд",
+    "settings": "Настройки",
+    "admin": "Админ-панель",
+    "pricing": "Тарифы",
+    "create": "Создать",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "next": "Далее",
+    "back": "Назад",
+    "calculate": "Рассчитать",
+    "exportPdf": "Экспорт в PDF",
+    "tryFree": "Попробовать бесплатно"
+  },
+  "landing": {
+    "heroTitle": "Узнайте бюджет и сроки MVP до начала разработки",
+    "heroSubtitle": "Пошаговый конструктор расчёта стоимости цифровых продуктов",
+    "benefits": {
+      "timeSaving": "Экономия времени",
+      "timeSavingDesc": "Расчёт за минуты вместо недель оценки",
+      "accuracy": "Точность оценки",
+      "accuracyDesc": "Нормативы на основе реальных проектов",
+      "transparency": "Прозрачность",
+      "transparencyDesc": "Детальная смета по ролям и сервисам"
+    },
+    "footer": {
+      "copyright": "© 2026 MVP Calculator. Все права защищены.",
+      "privacy": "Политика конфиденциальности",
+      "terms": "Условия использования"
+    }
+  },
+  "dashboard": {
+    "title": "Мои проекты",
+    "greeting": "Добро пожаловать",
+    "greetingDefault": "Добро пожаловать!",
+    "newProject": "Создать новый проект",
+    "projectLimit": "Создано {used} из {limit}",
+    "limitExhausted": "Лимит проектов исчерпан. Перейдите на платный тариф.",
+    "noProjects": "У вас пока нет проектов",
+    "draft": "Черновик",
+    "completed": "Завершён",
+    "openResult": "Открыть результат",
+    "editProject": "Редактировать",
+    "deleteProject": "Удалить проект"
+  },
+  "settings": {
+    "title": "Настройки",
+    "profile": "Профиль",
+    "teamRates": "Зарплаты команды",
+    "serviceTime": "Время на сервисы",
+    "customServices": "Кастомные сервисы",
+    "techCoefficients": "Коэффициенты технологий"
+  },
+  "calculator": {
+    "step1": "Описание",
+    "step2": "Сервисы",
+    "step3": "Технологии",
+    "step4": "Команда",
+    "step5": "Результат",
+    "projectName": "Название проекта",
+    "projectDescription": "Краткое описание",
+    "technologies": {
+      "frontend": "Фронтенд",
+      "backend": "Бэкенд",
+      "database": "База данных",
+      "mobile": "Мобильная разработка"
+    },
+    "services": {
+      "authentication": "Аутентификация",
+      "personalCabinet": "Личный кабинет",
+      "paymentSystem": "Платёжная система",
+      "chatBasic": "Чат (базовый)",
+      "adminPanel": "Админ-панель",
+      "notifications": "Уведомления",
+      "fileUpload": "Загрузка файлов",
+      "analytics": "Аналитика",
+      "socialIntegration": "Интеграция с соцсетями",
+      "search": "Поиск"
+    },
+    "team": {
+      "projectManager": "Project Manager",
+      "frontendDeveloper": "Frontend Developer",
+      "backendDeveloper": "Backend Developer",
+      "mobileDeveloper": "Mobile Developer",
+      "qaEngineer": "QA Engineer",
+      "devops": "DevOps",
+      "uiUxDesigner": "UI/UX Designer"
+    }
+  },
+  "pricing": {
+    "title": "Тарифы",
+    "free": "Бесплатный",
+    "pro": "Профессиональный",
+    "business": "Бизнес",
+    "comingSoon": "Скоро",
+    "currentPlan": "Текущий тариф"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Пароль",
+    "fullName": "Имя",
+    "signIn": "Войти",
+    "signUp": "Зарегистрироваться",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "signOut": "Выйти"
+  },
+  "validation": {
+    "required": "Обязательное поле",
+    "emailInvalid": "Некорректный email",
+    "passwordMin": "Минимум {min} символов",
+    "projectNameRequired": "Название проекта обязательно"
+  }
+}

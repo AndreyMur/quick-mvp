@@ -4,7 +4,8 @@
       "Bash(npm run *)",
       "Bash(rmdir *)",
       "Bash(npm install)",
-      "Bash(npx *)"
+      "Bash(npx *)",
+      "Bash(move *)"
     ]
   },
   "$version": 3
