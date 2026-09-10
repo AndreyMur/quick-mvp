@@ -1,6 +1,7 @@
 import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
+import { renderToBuffer } from "@react-pdf/renderer";
 import { isValidElement, type ReactNode } from "react";
 import {
   createMockSupabaseClient,
@@ -205,3 +206,129 @@ test("шаблон: водяной знак только для free-тариф�
   assert.ok(free.includes("MVP Calculator Demo"));
   assert.ok(!pro.includes("MVP Calculator Demo"));
 });
+
+// --- full report template (phase 18) ---
+
+const customResult: CalculationResult = {
+  ...sampleResult,
+  services: [
+    {
+      key: "web_app",
+      label: "Веб-приложение",
+      hours: 120,
+      cost: null,
+      is_custom: false,
+    },
+    {
+      key: "custom-1",
+      label: "Дизайн-система",
+      hours: 20,
+      cost: 50000,
+      is_custom: true,
+    },
+  ],
+  custom_service_fixed_cost: 50000,
+};
+
+function reportText(result: CalculationResult, isFree = false): string {
+  return collectText(
+    buildReportDocument({
+      project: { name: "Проект" },
+      result,
+      isFree,
+    })
+  )
+    .join("\n")
+    .replace(/\u00a0/g, " ");
+}
+
+test("шаблон: содержит таблицу сервисов (название, часы, стоимость) (#54)", () => {
+  const text = reportText(sampleResult);
+
+  assert.ok(text.includes("Сервисы"), "ожидался раздел сервисов");
+  assert.ok(text.includes("Название"), "ожидалась колонка названия");
+  assert.ok(text.includes("Веб-приложение"), "ожидалось название сервиса");
+  assert.ok(text.includes("120"), "ожидались часы сервиса");
+  assert.ok(text.includes("—"), "ожидался прочерк для сервиса без фикс. стоимости");
+});
+
+test("шаблон: содержит таблицу ролей (роль, ставка, часы, коэффициент, стоимость) (#55)", () => {
+  const text = reportText(sampleResult);
+
+  assert.ok(text.includes("Роли"), "ожидался раздел ролей");
+  assert.ok(text.includes("Ставка"), "ожидалась колонка ставки");
+  assert.ok(text.includes("Коэф."), "ожидалась колонка коэффициента");
+  assert.ok(text.includes("Frontend-разработчик"), "ожидалась роль");
+  assert.ok(text.includes("1 000 у.е."), "ожидалась ставка роли");
+  assert.ok(text.includes("72 000 у.е."), "ожидалась стоимость роли");
+  assert.ok(text.includes("1.20"), "ожидался коэффициент роли");
+});
+
+test("шаблон: содержит фиксированные стоимости кастомных сервисов (#55)", () => {
+  const text = reportText(customResult);
+
+  assert.ok(
+    text.includes("Фиксированные стоимости кастомных сервисов"),
+    "ожидался раздел кастомных сервисов"
+  );
+  assert.ok(text.includes("Дизайн-система"), "ожидалось название кастомного сервиса");
+  assert.ok(text.includes("50 000 у.е."), "ожидалась фиксированная стоимость");
+});
+
+test("шаблон: содержит подвал «Сгенерировано в MVP Calculator» (#56)", () => {
+  const text = reportText(sampleResult);
+
+  assert.ok(text.includes("Сгенерировано в MVP Calculator"));
+});
+
+test("шаблон: кириллица корректна, шрифт встроен (#57)", async () => {
+  const text = reportText(customResult);
+
+  assert.ok(text.includes("Frontend-разработчик"));
+  assert.ok(text.includes("Веб-приложение"));
+  assert.ok(text.includes("Стоимость"));
+  assert.ok(!text.includes("\ufffd"), "не должно быть символов замены");
+
+  const buffer = await renderToBuffer(
+    buildReportDocument({
+      project: { name: "Проект" },
+      result: customResult,
+      isFree: false,
+    })
+  );
+  assert.ok(
+    buffer.toString("latin1").includes("Roboto"),
+    "шрифт с кириллицей должен быть встроен в PDF"
+  );
+});
+
+function countPages(buffer: Buffer): number {
+  const text = buffer.toString("latin1");
+  return (text.match(/\/Type\s*\/Page(?![s])/g) ?? []).length;
+}
+
+test("шаблон: длинный отчёт разбивается на 2+ страницы без обрезки таблиц (#57)", async () => {
+  const manyRoles: CalculationResult = {
+    ...sampleResult,
+    roles: Array.from({ length: 60 }, (_, i) => ({
+      ...sampleResult.roles[0],
+      role: `role_${i}`,
+      label: `Роль ${i + 1}`,
+    })),
+  };
+
+  const document = buildReportDocument({
+    project: { name: "Большой проект" },
+    result: manyRoles,
+    isFree: false,
+  });
+
+  const text = collectText(document).join("\n");
+  assert.ok(text.includes("Роль 1"), "первая роль должна присутствовать");
+  assert.ok(text.includes("Роль 60"), "последняя роль должна присутствовать");
+
+  const buffer = await renderToBuffer(document);
+  const pages = countPages(buffer);
+  assert.ok(pages >= 2, `ожидалось 2+ страницы, получено ${pages}`);
+});
+
