@@ -1225,7 +1225,12 @@ export const openApiDocument = {
         tags: ["Export"],
         summary: "Экспортировать результат в PDF",
         description:
-          "Сейчас endpoint возвращает HTML для печати с content-disposition под PDF.",
+          "Серверная генерация PDF через @react-pdf/renderer. Ответ — бинарный " +
+          "файл application/pdf с Content-Disposition attachment. Для тарифа " +
+          "`free` (и при отсутствии/неизвестном тарифе) в документ добавляется " +
+          "водяной знак «MVP Calculator Demo»; для тарифов `pro` и `business` " +
+          "знака нет. Тариф определяется на сервере по таблице profiles, " +
+          "значение из тела запроса игнорируется.",
         security: [{ SupabaseSessionCookie: [] }],
         requestBody: {
           required: true,
@@ -1235,15 +1240,22 @@ export const openApiDocument = {
         },
         responses: {
           "200": {
-            description: "HTML-документ для печати/скачивания",
+            description: "PDF-файл для скачивания",
             content: {
-              "text/html": {
+              "application/pdf": {
                 schema: {
                   type: "string",
+                  format: "binary",
                 },
               },
             },
           },
+          "400": errorResponse("Неверные данные", {
+            error: "Неверные данные",
+          }),
+          "500": errorResponse("Ошибка при генерации PDF", {
+            error: "Ошибка при генерации PDF",
+          }),
         },
       },
     },

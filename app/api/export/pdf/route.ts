@@ -20,7 +20,10 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Check subscription tier for watermark (server-side, never trust the client)
+  // Check subscription tier for watermark (server-side, never trust the client).
+  // Default to the free tier (watermark on) unless the profile explicitly holds
+  // a paid tier, so a missing/unknown tier never silently removes the mark.
+  const PAID_TIERS = new Set(["pro", "business"]);
   let isFree = true;
   if (user) {
     const { data: profile } = await supabase
@@ -28,8 +31,9 @@ export async function POST(request: NextRequest) {
       .select("subscription_tier")
       .eq("id", user.id)
       .single();
-    const p = profile as { subscription_tier?: string } | null;
-    isFree = p?.subscription_tier === "free";
+    const tier = (profile as { subscription_tier?: string | null } | null)
+      ?.subscription_tier;
+    isFree = !tier || !PAID_TIERS.has(tier);
   }
 
   const body = await request.json();
