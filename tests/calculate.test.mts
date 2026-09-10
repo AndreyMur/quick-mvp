@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { calculateProject } from "../lib/calculate.ts";
+import { calculateProject, CALCULATION_VERSION } from "../lib/calculate.ts";
 import type {
   CalculateInput,
   CalculationReferences,
@@ -211,4 +211,153 @@ test("чистое ядро не содержит обращений к Supabase
   assert.doesNotMatch(source, /supabase/i);
   assert.doesNotMatch(source, /createClient/);
   assert.doesNotMatch(source, /from\s+["']@\/lib\/supabase/);
+});
+
+test("неравные веса распределяют базовые часы пропорционально", () => {
+  const input: CalculateInput = {
+    services: ["web_app"],
+    technologies: { frontend: "", backend: "", database: "", mobile: null },
+    team: [
+      { role: "frontend_developer", count: 1, weight: 3 },
+      { role: "backend_developer", count: 1, weight: 1 },
+    ],
+  };
+  const references: CalculationReferences = {
+    ...emptyReferences(),
+    globalServiceHours: [{ service_key: "web_app", hours: 80, fixed_cost: null }],
+    globalRates: [
+      { role: "frontend_developer", hourly_rate: 100 },
+      { role: "backend_developer", hourly_rate: 100 },
+    ],
+  };
+
+  const result = calculateProject(input, references);
+
+  const frontend = result.roles.find((r) => r.role === "frontend_developer");
+  const backend = result.roles.find((r) => r.role === "backend_developer");
+  assert.ok(frontend);
+  assert.ok(backend);
+
+  assert.equal(frontend.weight, 3);
+  assert.equal(backend.weight, 1);
+  assertClose(frontend.base_hours, 60);
+  assertClose(backend.base_hours, 20);
+  assertClose(frontend.cost, 6000);
+  assertClose(backend.cost, 2000);
+  assertClose(result.total_base_hours, 80);
+  assertClose(result.total_adjusted_hours, 80);
+  assertClose(result.total_cost, 8000);
+});
+
+test("равные веса дают результат, идентичный прежнему (регрессия)", () => {
+  const base = {
+    services: ["web_app"],
+    technologies: { frontend: "", backend: "", database: "", mobile: null },
+  };
+  const references: CalculationReferences = {
+    ...emptyReferences(),
+    globalServiceHours: [{ service_key: "web_app", hours: 90, fixed_cost: null }],
+    globalRates: [
+      { role: "project_manager", hourly_rate: 100 },
+      { role: "frontend_developer", hourly_rate: 120 },
+      { role: "backend_developer", hourly_rate: 140 },
+    ],
+  };
+
+  const withoutWeights: CalculateInput = {
+    ...base,
+    team: [
+      { role: "project_manager", count: 1 },
+      { role: "frontend_developer", count: 1 },
+      { role: "backend_developer", count: 1 },
+    ],
+  };
+  const withEqualWeights: CalculateInput = {
+    ...base,
+    team: [
+      { role: "project_manager", count: 1, weight: 1 },
+      { role: "frontend_developer", count: 1, weight: 1 },
+      { role: "backend_developer", count: 1, weight: 1 },
+    ],
+  };
+
+  assert.deepEqual(
+    calculateProject(withEqualWeights, references),
+    calculateProject(withoutWeights, references)
+  );
+});
+
+test("роль с нулевым весом получает 0 базовых часов", () => {
+  const input: CalculateInput = {
+    services: ["web_app"],
+    technologies: { frontend: "", backend: "", database: "", mobile: null },
+    team: [
+      { role: "frontend_developer", count: 1, weight: 2 },
+      { role: "qa_engineer", count: 1, weight: 0 },
+    ],
+  };
+  const references: CalculationReferences = {
+    ...emptyReferences(),
+    globalServiceHours: [{ service_key: "web_app", hours: 60, fixed_cost: null }],
+    globalRates: [
+      { role: "frontend_developer", hourly_rate: 100 },
+      { role: "qa_engineer", hourly_rate: 100 },
+    ],
+  };
+
+  const result = calculateProject(input, references);
+
+  const qa = result.roles.find((r) => r.role === "qa_engineer");
+  assert.ok(qa);
+  assert.equal(qa.base_hours, 0);
+  assert.equal(qa.adjusted_hours, 0);
+  assert.equal(qa.cost, 0);
+  assertClose(result.total_base_hours, 60);
+  assertClose(result.total_adjusted_hours, 60);
+});
+
+test("нулевая сумма весов не роняет расчёт и даёт равное распределение", () => {
+  const input: CalculateInput = {
+    services: ["web_app"],
+    technologies: { frontend: "", backend: "", database: "", mobile: null },
+    team: [
+      { role: "frontend_developer", count: 1, weight: 0 },
+      { role: "backend_developer", count: 1, weight: 0 },
+    ],
+  };
+  const references: CalculationReferences = {
+    ...emptyReferences(),
+    globalServiceHours: [{ service_key: "web_app", hours: 80, fixed_cost: null }],
+    globalRates: [
+      { role: "frontend_developer", hourly_rate: 100 },
+      { role: "backend_developer", hourly_rate: 100 },
+    ],
+  };
+
+  const result = calculateProject(input, references);
+
+  assert.equal(result.roles.length, 2);
+  for (const role of result.roles) {
+    assert.equal(role.weight, 1);
+    assertClose(role.base_hours, 40);
+  }
+  assertClose(result.total_base_hours, 80);
+  assertClose(result.total_adjusted_hours, 80);
+});
+
+test("результат содержит версию алгоритма", () => {
+  const input: CalculateInput = {
+    services: ["web_app"],
+    technologies: { frontend: "", backend: "", database: "", mobile: null },
+    team: [{ role: "frontend_developer", count: 1 }],
+  };
+  const references: CalculationReferences = {
+    ...emptyReferences(),
+    globalServiceHours: [{ service_key: "web_app", hours: 40, fixed_cost: null }],
+  };
+
+  const result = calculateProject(input, references);
+
+  assert.equal(result.version, CALCULATION_VERSION);
+  assert.match(result.version, /^\d+\.\d+\.\d+$/);
 });

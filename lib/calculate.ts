@@ -6,6 +6,12 @@ import type {
   ServiceCost,
 } from "@/lib/types/project";
 
+/**
+ * Version of the calculation algorithm. Bumped whenever the core changes in a
+ * way that may alter results, so snapshots can be interpreted unambiguously.
+ */
+export const CALCULATION_VERSION = "2.0.0";
+
 // Map role keys to display labels
 const ROLE_LABELS: Record<string, string> = {
   project_manager: "Project Manager",
@@ -107,11 +113,26 @@ export function calculateProject(
     }
   }
 
-  // --- Step 2: Distribute hours evenly across active roles ---
+  // --- Step 2: Distribute hours across active roles proportionally to weights ---
 
   const activeRoles = input.team.filter((r) => r.count > 0);
-  const numRoles = activeRoles.length;
-  const baseHoursPerRole = numRoles > 0 ? totalBaseHours / numRoles : 0;
+
+  // Normalize weights: missing/non-positive values become 0, omitted weight means 1.
+  const rawWeights = activeRoles.map((r) =>
+    r.weight === undefined ? 1 : r.weight > 0 && Number.isFinite(r.weight) ? r.weight : 0
+  );
+  let weightSum = rawWeights.reduce((sum, w) => sum + w, 0);
+
+  // Explicit fallback: a zero (or invalid) total weight must not break the
+  // calculation — fall back to an even distribution, i.e. the legacy behavior.
+  const weights =
+    weightSum > 0 ? rawWeights : activeRoles.map(() => 1);
+  if (weightSum <= 0) {
+    weightSum = weights.length;
+  }
+
+  const baseHoursPerRole = (weight: number) =>
+    weightSum > 0 ? (totalBaseHours * weight) / weightSum : 0;
 
   // --- Step 3: Apply technology coefficients ---
 
@@ -126,7 +147,11 @@ export function calculateProject(
     input.technologies.mobile,
   ].filter(Boolean) as string[];
 
-  for (const teamRole of activeRoles) {
+  for (let i = 0; i < activeRoles.length; i++) {
+    const teamRole = activeRoles[i];
+    const weight = weights[i];
+    const roleBaseHours = baseHoursPerRole(weight);
+
     // Determine coefficient for this role
     let coefficient = 1.0;
 
@@ -139,7 +164,7 @@ export function calculateProject(
       }
     }
 
-    const adjustedHours = baseHoursPerRole * coefficient;
+    const adjustedHours = roleBaseHours * coefficient;
     totalAdjustedHours += adjustedHours;
 
     // Get rate: user rate → global rate
@@ -153,11 +178,12 @@ export function calculateProject(
       role: teamRole.role,
       label: ROLE_LABELS[teamRole.role] ?? teamRole.role,
       hourly_rate: hourlyRate,
-      base_hours: baseHoursPerRole,
+      base_hours: roleBaseHours,
       coefficient,
       adjusted_hours: adjustedHours,
       cost,
       count: teamRole.count,
+      weight,
     });
   }
 
@@ -180,6 +206,7 @@ export function calculateProject(
   const calendarDays = totalPeople > 0 ? totalAdjustedHours / (totalPeople * 8) : 0;
 
   return {
+    version: CALCULATION_VERSION,
     total_base_hours: totalBaseHours,
     total_adjusted_hours: totalAdjustedHours,
     total_cost: totalCost,

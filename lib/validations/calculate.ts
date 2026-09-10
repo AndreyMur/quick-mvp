@@ -14,6 +14,7 @@ export const calculateInputSchema: z.ZodType<CalculateInput> = z.object({
       z.object({
         role: z.string(),
         count: z.number().int().positive(),
+        weight: z.number().finite().nonnegative().optional(),
       })
     )
     .min(1, "Выберите хотя бы одну роль"),

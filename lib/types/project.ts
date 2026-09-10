@@ -7,6 +7,7 @@ export interface RoleCost {
   adjusted_hours: number;
   cost: number;
   count: number;
+  weight: number;
 }
 
 export interface ServiceCost {
@@ -18,6 +19,7 @@ export interface ServiceCost {
 }
 
 export interface CalculationResult {
+  version: string;
   total_base_hours: number;
   total_adjusted_hours: number;
   total_cost: number;
@@ -48,7 +50,7 @@ export interface CalculateInput {
     database: string;
     mobile?: string | null;
   };
-  team: Array<{ role: string; count: number }>;
+  team: Array<{ role: string; count: number; weight?: number }>;
 }
 
 export interface RateReference {
