@@ -32,6 +32,12 @@
 __pycache__/
 *.pyc
 
+# figma mcp image downloads
+/.figma/
+
+# generated agent skill links
+/.claude/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
