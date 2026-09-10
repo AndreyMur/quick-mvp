@@ -1,57 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/supabase/database.types";
-
-type GlobalRate = Database["public"]["Tables"]["global_rates"]["Row"];
-type GlobalServiceHour = Database["public"]["Tables"]["global_service_hours"]["Row"];
-type UserServiceHour = Database["public"]["Tables"]["user_service_hours"]["Row"];
-type CustomService = Database["public"]["Tables"]["custom_services"]["Row"];
-type TechCoeff = Database["public"]["Tables"]["technology_coefficients"]["Row"];
-type UserRate = Database["public"]["Tables"]["user_rates"]["Row"];
-
-interface TeamRole {
-  role: string;
-  count: number;
-}
-
-interface CalculateInput {
-  services: string[];
-  technologies: {
-    frontend: string;
-    backend: string;
-    database: string;
-    mobile?: string | null;
-  };
-  team: TeamRole[];
-}
-
-interface RoleResult {
-  role: string;
-  label: string;
-  hourly_rate: number;
-  base_hours: number;
-  coefficient: number;
-  adjusted_hours: number;
-  cost: number;
-  count: number;
-}
-
-interface ServiceResult {
-  key: string;
-  label: string;
-  hours: number;
-  cost: number | null;
-  is_custom: boolean;
-}
-
-export interface CalculateResult {
-  total_base_hours: number;
-  total_adjusted_hours: number;
-  total_cost: number;
-  calendar_days: number;
-  roles: RoleResult[];
-  services: ServiceResult[];
-  custom_service_fixed_cost: number;
-}
+import type {
+  CalculateInput,
+  CalculationReferences,
+  CalculationResult,
+  RoleCost,
+  ServiceCost,
+} from "@/lib/types/project";
 
 // Map role keys to display labels
 const ROLE_LABELS: Record<string, string> = {
@@ -82,75 +35,46 @@ const TECH_ROLE_MAP: Record<string, string[]> = {
   native_android: ["mobile_developer"],
 };
 
-export async function calculateProject(
-  userId: string,
-  input: CalculateInput
-): Promise<CalculateResult> {
-  const supabase = await createClient();
-
-  // --- Fetch all needed data ---
-
-  // Global rates
-  const { data: globalRates } = await supabase
-    .from("global_rates")
-    .select("*");
-
-  // Global service hours
-  const { data: globalServiceHours } = await supabase
-    .from("global_service_hours")
-    .select("*");
-
-  // User rates
-  const { data: userRates } = await supabase
-    .from("user_rates")
-    .select("*")
-    .eq("user_id", userId);
-
-  // User service hours
-  const { data: userServiceHours } = await supabase
-    .from("user_service_hours")
-    .select("*")
-    .eq("user_id", userId);
-
-  // Custom services (user's own + global)
-  const { data: customServices } = await supabase
-    .from("custom_services")
-    .select("*")
-    .or(`user_id.eq.${userId},user_id.is.null`);
-
-  // Technology coefficients
-  const { data: techCoeffs } = await supabase
-    .from("technology_coefficients")
-    .select("*");
-
-  // --- Build lookup maps ---
+/**
+ * Pure calculation core: no I/O, no database access.
+ * All reference data (rates, norms, coefficients) is passed in explicitly.
+ */
+export function calculateProject(
+  input: CalculateInput,
+  references: CalculationReferences
+): CalculationResult {
+  // --- Build lookup maps from the provided references ---
 
   const globalRateMap = new Map<string, number>();
-  (globalRates ?? []).forEach((r: GlobalRate) => globalRateMap.set(r.role, r.hourly_rate));
+  references.globalRates.forEach((r) => globalRateMap.set(r.role, r.hourly_rate));
 
   const globalHoursMap = new Map<string, { hours: number; fixed_cost: number | null }>();
-  (globalServiceHours ?? []).forEach((s: GlobalServiceHour) =>
+  references.globalServiceHours.forEach((s) =>
     globalHoursMap.set(s.service_key, { hours: s.hours, fixed_cost: s.fixed_cost })
   );
 
   const userRateMap = new Map<string, number>();
-  (userRates ?? []).forEach((r: UserRate) => userRateMap.set(r.role, r.hourly_rate));
+  references.userRates.forEach((r) => userRateMap.set(r.role, r.hourly_rate));
 
   const userHoursMap = new Map<string, { hours: number; fixed_cost: number | null }>();
-  (userServiceHours ?? []).forEach((s: UserServiceHour) =>
+  references.userServiceHours.forEach((s) =>
     userHoursMap.set(s.service_key, { hours: s.hours, fixed_cost: s.fixed_cost })
   );
 
-  const customServiceMap = new Map<string, CustomService>();
-  (customServices ?? []).forEach((s: CustomService) => customServiceMap.set(s.id, s));
+  const customServiceMap = new Map<string, { name: string; hours: number; fixed_cost: number | null }>();
+  references.customServices.forEach((s) =>
+    customServiceMap.set(s.id, { name: s.name, hours: s.hours, fixed_cost: s.fixed_cost })
+  );
 
   const techCoeffMap = new Map<string, number>();
-  (techCoeffs ?? []).forEach((c: TechCoeff) => techCoeffMap.set(c.technology_key, c.coefficient));
+  references.technologyCoefficients.forEach((c) =>
+    techCoeffMap.set(c.technology_key, c.coefficient)
+  );
 
   // --- Step 1: Calculate total_base_hours ---
 
   let totalBaseHours = 0;
-  const services: ServiceResult[] = [];
+  const services: ServiceCost[] = [];
 
   for (const serviceKey of input.services) {
     const customService = customServiceMap.get(serviceKey);
@@ -191,20 +115,20 @@ export async function calculateProject(
 
   // --- Step 3: Apply technology coefficients ---
 
-  const roles: RoleResult[] = [];
+  const roles: RoleCost[] = [];
   let totalAdjustedHours = 0;
+
+  // Collect all selected tech keys once
+  const selectedTechs = [
+    input.technologies.frontend,
+    input.technologies.backend,
+    input.technologies.database,
+    input.technologies.mobile,
+  ].filter(Boolean) as string[];
 
   for (const teamRole of activeRoles) {
     // Determine coefficient for this role
     let coefficient = 1.0;
-
-    // Collect all selected tech keys
-    const selectedTechs = [
-      input.technologies.frontend,
-      input.technologies.backend,
-      input.technologies.database,
-      input.technologies.mobile,
-    ].filter(Boolean) as string[];
 
     // Find techs that affect this role
     for (const techKey of selectedTechs) {
