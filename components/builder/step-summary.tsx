@@ -111,7 +111,11 @@ export function StepSummary() {
         body: JSON.stringify({
           services: selectedServices,
           technologies: technology,
-          team: activeRoles.map((r) => ({ role: r.role, count: r.count })),
+          team: activeRoles.map((r) => ({
+            role: r.role,
+            count: r.count,
+            weight: r.weight,
+          })),
         }),
       });
 
@@ -211,7 +215,12 @@ export function StepSummary() {
                 className="flex items-center justify-between text-sm"
               >
                 <span>{role.label}</span>
-                <Badge>{role.count}</Badge>
+                <span className="flex items-center gap-2">
+                  <span className="text-muted-foreground">
+                    {t("weight")} {role.weight}
+                  </span>
+                  <Badge>{role.count}</Badge>
+                </span>
               </div>
             ))}
             {activeRoles.length === 0 && (

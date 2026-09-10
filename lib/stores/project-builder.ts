@@ -7,6 +7,7 @@ export interface TeamRole {
   role: string;
   label: string;
   count: number;
+  weight: number;
 }
 
 export interface ProjectBuilderState {
@@ -41,6 +42,7 @@ export interface ProjectBuilderState {
     value: string
   ) => void;
   setTeamRoleCount: (role: string, count: number) => void;
+  setTeamRoleWeight: (role: string, weight: number) => void;
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -50,14 +52,62 @@ export interface ProjectBuilderState {
 }
 
 const defaultTeamRoles: TeamRole[] = [
-  { role: "project_manager", label: "Project Manager", count: 1 },
-  { role: "frontend_developer", label: "Frontend Developer", count: 1 },
-  { role: "backend_developer", label: "Backend Developer", count: 1 },
-  { role: "mobile_developer", label: "Mobile Developer", count: 0 },
-  { role: "qa_engineer", label: "QA Engineer", count: 1 },
-  { role: "devops", label: "DevOps", count: 0 },
-  { role: "ui_ux_designer", label: "UI/UX Designer", count: 0 },
+  { role: "project_manager", label: "Project Manager", count: 1, weight: 1 },
+  { role: "frontend_developer", label: "Frontend Developer", count: 1, weight: 1 },
+  { role: "backend_developer", label: "Backend Developer", count: 1, weight: 1 },
+  { role: "mobile_developer", label: "Mobile Developer", count: 0, weight: 1 },
+  { role: "qa_engineer", label: "QA Engineer", count: 1, weight: 1 },
+  { role: "devops", label: "DevOps", count: 0, weight: 1 },
+  { role: "ui_ux_designer", label: "UI/UX Designer", count: 0, weight: 1 },
 ];
+
+/**
+ * Normalizes persisted/loaded team roles. Older localStorage snapshots and
+ * saved projects store roles without a `weight`; those are treated as `1`
+ * (legacy even distribution) instead of being dropped.
+ */
+export function normalizeTeamRoles(value: unknown): TeamRole[] {
+  if (!Array.isArray(value)) return defaultTeamRoles;
+
+  const normalized: TeamRole[] = [];
+  for (const raw of value) {
+    if (typeof raw !== "object" || raw === null) continue;
+    const record = raw as Record<string, unknown>;
+    if (typeof record.role !== "string" || record.role.length === 0) continue;
+
+    const rawCount = record.count;
+    const count =
+      typeof rawCount === "number" && Number.isFinite(rawCount)
+        ? Math.max(0, Math.floor(rawCount))
+        : 0;
+
+    const rawWeight = record.weight;
+    const weight =
+      typeof rawWeight === "number" && Number.isFinite(rawWeight) && rawWeight >= 0
+        ? rawWeight
+        : 1;
+
+    normalized.push({
+      role: record.role,
+      label:
+        typeof record.label === "string" && record.label.length > 0
+          ? record.label
+          : record.role,
+      count,
+      weight,
+    });
+  }
+
+  return normalized;
+}
+
+/**
+ * A team selection is valid when at least one active role has a positive
+ * weight, i.e. the sum of weights across active roles is greater than zero.
+ */
+export function isTeamSelectionValid(teamRoles: TeamRole[]): boolean {
+  return teamRoles.some((role) => role.count > 0 && role.weight > 0);
+}
 
 const TOTAL_STEPS = 5;
 
@@ -104,6 +154,13 @@ export const useProjectBuilder = create<ProjectBuilderState>()(
           ),
         })),
 
+      setTeamRoleWeight: (role, weight) =>
+        set((state) => ({
+          teamRoles: state.teamRoles.map((r) =>
+            r.role === role ? { ...r, weight: Math.max(0, weight) } : r
+          ),
+        })),
+
       setCurrentStep: (step) => set({ currentStep: step }),
 
       nextStep: () =>
@@ -130,7 +187,7 @@ export const useProjectBuilder = create<ProjectBuilderState>()(
               state.technology.database.length > 0
             );
           case 4:
-            return state.teamRoles.some((r) => r.count > 0);
+            return isTeamSelectionValid(state.teamRoles);
           default:
             return true;
         }
@@ -151,7 +208,14 @@ export const useProjectBuilder = create<ProjectBuilderState>()(
           currentStep: 1,
         }),
 
-      hydrate: (data) => set((state) => ({ ...state, ...data })),
+      hydrate: (data) =>
+        set((state) => ({
+          ...state,
+          ...data,
+          teamRoles: data.teamRoles
+            ? normalizeTeamRoles(data.teamRoles)
+            : state.teamRoles,
+        })),
     }),
     {
       name: "project-builder-storage",
@@ -164,6 +228,16 @@ export const useProjectBuilder = create<ProjectBuilderState>()(
         teamRoles: state.teamRoles,
         currentStep: state.currentStep,
       }),
+      // Older persisted state has no `weight` on team roles; normalize on
+      // rehydration so weights default to 1 (legacy even distribution).
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState ?? {}) as Partial<ProjectBuilderState>;
+        return {
+          ...currentState,
+          ...persisted,
+          teamRoles: normalizeTeamRoles(persisted.teamRoles),
+        };
+      },
     }
   )
 );

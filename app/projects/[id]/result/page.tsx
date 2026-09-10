@@ -90,7 +90,9 @@ export default function ResultPage({
         body: JSON.stringify({
           services: selectedServices,
           technologies: technology,
-          team: teamRoles.filter((r) => r.count > 0).map((r) => ({ role: r.role, count: r.count })),
+          team: teamRoles
+            .filter((r) => r.count > 0)
+            .map((r) => ({ role: r.role, count: r.count, weight: r.weight })),
         }),
       });
 
@@ -216,6 +218,8 @@ export default function ResultPage({
     name: r.label,
     value: Math.round(r.cost),
   }));
+
+  const totalWeight = result.roles.reduce((sum, r) => sum + r.weight, 0);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -365,6 +369,7 @@ export default function ResultPage({
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("role")}</TableHead>
+                  <TableHead className="text-right">{t("weight")}</TableHead>
                   <TableHead className="text-right">{t("rate")}</TableHead>
                   <TableHead className="text-right">{t("hours")}</TableHead>
                   <TableHead className="text-right">{t("coefficient")}</TableHead>
@@ -377,6 +382,17 @@ export default function ResultPage({
                     <TableCell>
                       {r.label}
                       <span className="text-muted-foreground text-xs ml-1">×{r.count}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {format.number(r.weight, { maximumFractionDigits: 2 })}
+                      {totalWeight > 0 && (
+                        <span className="text-muted-foreground text-xs ml-1">
+                          ({format.number((r.weight / totalWeight) * 100, {
+                            maximumFractionDigits: 0,
+                          })}
+                          %)
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">{format.number(r.hourly_rate)}</TableCell>
                     <TableCell className="text-right">{format.number(Math.round(r.adjusted_hours))}</TableCell>
