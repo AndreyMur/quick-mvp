@@ -5,6 +5,11 @@
       "type": "local",
       "command": ["npx", "-y", "@playwright/mcp@latest", "--headless"],
       "enabled": true
+    },
+    "figma": {
+      "type": "local",
+      "command": ["npx", "-y", "figma-developer-mcp", "--stdio", "--no-telemetry", "--image-dir", ".figma"],
+      "enabled": true
     }
   }
 }
