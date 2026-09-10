@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +14,24 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { toast } from "sonner";
 
-const signUpSchema = z.object({
-  fullName: z.string().min(2, "Минимум 2 символа").optional(),
-  email: z.string().email("Некорректный email"),
-  password: z.string().min(6, "Минимум 6 символов"),
-});
-
-type SignUpFormData = z.infer<typeof signUpSchema>;
-
 export function SignUpForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+  const t = useTranslations("auth.signUp");
+  const tv = useTranslations("auth.validation");
+
+  const signUpSchema = useMemo(
+    () =>
+      z.object({
+        fullName: z.string().min(2, tv("minName")).optional(),
+        email: z.string().email(tv("invalidEmail")),
+        password: z.string().min(6, tv("minPassword")),
+      }),
+    [tv],
+  );
+
+  type SignUpFormData = z.infer<typeof signUpSchema>;
 
   const {
     register,
@@ -52,12 +59,10 @@ export function SignUpForm() {
         return;
       }
 
-      toast.success(
-        "Регистрация успешна! Проверьте email для подтверждения."
-      );
+      toast.success(t("success"));
       router.push("/login");
     } catch {
-      toast.error("Произошла ошибка при регистрации");
+      toast.error(t("error"));
     } finally {
       setLoading(false);
     }
@@ -66,19 +71,17 @@ export function SignUpForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Регистрация</CardTitle>
-        <CardDescription>
-          Создайте аккаунт для начала работы
-        </CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Имя</Label>
+            <Label htmlFor="fullName">{t("nameLabel")}</Label>
             <Input
               id="fullName"
               type="text"
-              placeholder="Иван Иванов"
+              placeholder={t("namePlaceholder")}
               {...register("fullName")}
               disabled={loading}
             />
@@ -102,7 +105,7 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
+            <Label htmlFor="password">{t("passwordLabel")}</Label>
             <Input
               id="password"
               type="password"
@@ -116,13 +119,13 @@ export function SignUpForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Регистрируем..." : "Зарегистрироваться"}
+            {loading ? t("submitting") : t("submit")}
           </Button>
 
           <p className="text-sm text-center text-muted-foreground">
-            Уже есть аккаунт?{" "}
+            {t("hasAccount")}{" "}
             <Link href="/login" className="text-primary hover:underline">
-              Войти
+              {t("loginLink")}
             </Link>
           </p>
         </form>

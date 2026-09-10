@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -15,58 +16,59 @@ interface Limits {
   can_create_project: boolean;
 }
 
-const tiers = [
-  {
-    name: "Бесплатный",
-    key: "free",
-    price: "0",
-    description: "Для знакомства с продуктом",
-    features: [
-      { text: "3 проекта", included: true },
-      { text: "До 2 кастомных сервисов", included: true },
-      { text: "Все базовые функции расчёта", included: true },
-      { text: "Экспорт в PDF", included: true },
-      { text: "Водяной знак в PDF", included: false },
-    ],
-    cta: "Текущий тариф",
-    ctaActive: true,
-  },
-  {
-    name: "Профессиональный",
-    key: "pro",
-    price: "99",
-    description: "Для фрилансеров и небольших команд",
-    features: [
-      { text: "20 проектов", included: true },
-      { text: "Безлимитные кастомные сервисы", included: true },
-      { text: "Без водяного знака", included: true },
-      { text: "Приоритетная поддержка", included: true },
-      { text: "Командный доступ", included: false },
-    ],
-    cta: "Скоро",
-    ctaActive: false,
-  },
-  {
-    name: "Бизнес",
-    key: "business",
-    price: "299",
-    description: "Для крупных организаций",
-    features: [
-      { text: "Безлимитные проекты", included: true },
-      { text: "Безлимитные кастомные сервисы", included: true },
-      { text: "Без водяного знака", included: true },
-      { text: "Командный доступ", included: true },
-      { text: "API-доступ", included: true },
-    ],
-    cta: "Скоро",
-    ctaActive: false,
-  },
-];
-
 export default function PricingPage() {
   const { profile } = useAuth();
+  const t = useTranslations("pricing");
   const [limits, setLimits] = useState<Limits | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const tiers = [
+    {
+      name: t("tiers.free.name"),
+      key: "free",
+      price: "0",
+      description: t("tiers.free.description"),
+      features: [
+        { text: t("tiers.free.features.projects"), included: true },
+        { text: t("tiers.free.features.customServices"), included: true },
+        { text: t("tiers.free.features.baseFeatures"), included: true },
+        { text: t("tiers.free.features.pdfExport"), included: true },
+        { text: t("tiers.free.features.watermark"), included: false },
+      ],
+      cta: t("tiers.free.cta"),
+      ctaActive: true,
+    },
+    {
+      name: t("tiers.pro.name"),
+      key: "pro",
+      price: "99",
+      description: t("tiers.pro.description"),
+      features: [
+        { text: t("tiers.pro.features.projects"), included: true },
+        { text: t("tiers.pro.features.customServices"), included: true },
+        { text: t("tiers.pro.features.noWatermark"), included: true },
+        { text: t("tiers.pro.features.prioritySupport"), included: true },
+        { text: t("tiers.pro.features.teamAccess"), included: false },
+      ],
+      cta: t("tiers.pro.cta"),
+      ctaActive: false,
+    },
+    {
+      name: t("tiers.business.name"),
+      key: "business",
+      price: "299",
+      description: t("tiers.business.description"),
+      features: [
+        { text: t("tiers.business.features.projects"), included: true },
+        { text: t("tiers.business.features.customServices"), included: true },
+        { text: t("tiers.business.features.noWatermark"), included: true },
+        { text: t("tiers.business.features.teamAccess"), included: true },
+        { text: t("tiers.business.features.apiAccess"), included: true },
+      ],
+      cta: t("tiers.business.cta"),
+      ctaActive: false,
+    },
+  ];
 
   const fetchLimits = useCallback(async () => {
     try {
@@ -91,14 +93,18 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1 container mx-auto py-10 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Тарифы</h1>
+          <h1 className="text-4xl font-bold mb-4">{t("title")}</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Выберите подходящий тариф для вашего проекта
+            {t("subtitle")}
           </p>
           {limits && (
             <p className="text-sm text-muted-foreground mt-4">
-              Текущий тариф: <Badge variant="secondary" className="capitalize">{limits.subscription_tier}</Badge>
-              {" "}· Создано {limits.projects_used} из {limits.project_limit} проектов
+              {t("currentPlan")}: <Badge variant="secondary" className="capitalize">{limits.subscription_tier}</Badge>
+              {" "}·{" "}
+              {t("projectsUsed", {
+                used: limits.projects_used,
+                limit: limits.project_limit,
+              })}
             </p>
           )}
         </div>
@@ -120,7 +126,7 @@ export default function PricingPage() {
                   }`}
                 >
                   {isCurrent && (
-                    <Badge className="absolute -top-3 left-4">Текущий тариф</Badge>
+                    <Badge className="absolute -top-3 left-4">{t("currentPlan")}</Badge>
                   )}
                   <CardHeader>
                     <CardTitle className="text-xl">{tier.name}</CardTitle>
@@ -130,7 +136,7 @@ export default function PricingPage() {
                     <div className="mb-6">
                       <span className="text-4xl font-bold">{tier.price}</span>
                       {tier.price !== "0" && (
-                        <span className="text-muted-foreground ml-1">у.е./мес</span>
+                        <span className="text-muted-foreground ml-1">{t("perMonth")}</span>
                       )}
                     </div>
                     <ul className="space-y-3">

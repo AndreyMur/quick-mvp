@@ -3,6 +3,127 @@
     "cancel": "Отмена",
     "delete": "Удалить"
   },
+  "metadata": {
+    "title": "MVP Calculator",
+    "description": "Рассчитайте стоимость и сроки создания MVP за 5 минут"
+  },
+  "header": {
+    "dashboard": "Дашборд",
+    "settings": "Настройки",
+    "pricing": "Тарифы",
+    "admin": "Админ",
+    "adminPanel": "Админ-панель",
+    "toggleTheme": "Переключить тему",
+    "login": "Войти"
+  },
+  "home": {
+    "heroTitleLine1": "Узнайте бюджет и сроки MVP",
+    "heroTitleLine2": "до начала разработки",
+    "heroSubtitle": "Пошаговый конструктор расчёта стоимости цифровых продуктов. Рассчитайте стоимость и сроки создания MVP за 5 минут.",
+    "createProject": "Создать проект",
+    "tryFree": "Попробовать бесплатно",
+    "benefitsTitle": "Почему MVP Calculator?",
+    "benefits": {
+      "time": {
+        "title": "Экономия времени",
+        "text": "Расчёт за минуты вместо недель оценки"
+      },
+      "accuracy": {
+        "title": "Точность оценки",
+        "text": "Нормативы на основе реальных проектов"
+      },
+      "transparency": {
+        "title": "Прозрачность",
+        "text": "Детальная смета по ролям и сервисам"
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 MVP Calculator. Все права защищены.",
+      "privacy": "Политика конфиденциальности",
+      "terms": "Условия использования"
+    }
+  },
+  "auth": {
+    "signOut": "Выйти",
+    "validation": {
+      "invalidEmail": "Некорректный email",
+      "minPassword": "Минимум 6 символов",
+      "minName": "Минимум 2 символа"
+    },
+    "signIn": {
+      "title": "Вход",
+      "description": "Введите email и пароль для входа в аккаунт",
+      "passwordLabel": "Пароль",
+      "submit": "Войти",
+      "submitting": "Входим...",
+      "noAccount": "Нет аккаунта?",
+      "registerLink": "Зарегистрироваться",
+      "success": "Вход выполнен",
+      "error": "Произошла ошибка при входе"
+    },
+    "signUp": {
+      "title": "Регистрация",
+      "description": "Создайте аккаунт для начала работы",
+      "nameLabel": "Имя",
+      "namePlaceholder": "Иван Иванов",
+      "passwordLabel": "Пароль",
+      "submit": "Зарегистрироваться",
+      "submitting": "Регистрируем...",
+      "hasAccount": "Уже есть аккаунт?",
+      "loginLink": "Войти",
+      "success": "Регистрация успешна! Проверьте email для подтверждения.",
+      "error": "Произошла ошибка при регистрации"
+    }
+  },
+  "pricing": {
+    "title": "Тарифы",
+    "subtitle": "Выберите подходящий тариф для вашего проекта",
+    "currentPlan": "Текущий тариф",
+    "projectsUsed": "Создано {used} из {limit} проектов",
+    "perMonth": "у.е./мес",
+    "tiers": {
+      "free": {
+        "name": "Бесплатный",
+        "description": "Для знакомства с продуктом",
+        "cta": "Текущий тариф",
+        "features": {
+          "projects": "3 проекта",
+          "customServices": "До 2 кастомных сервисов",
+          "baseFeatures": "Все базовые функции расчёта",
+          "pdfExport": "Экспорт в PDF",
+          "watermark": "Водяной знак в PDF"
+        }
+      },
+      "pro": {
+        "name": "Профессиональный",
+        "description": "Для фрилансеров и небольших команд",
+        "cta": "Скоро",
+        "features": {
+          "projects": "20 проектов",
+          "customServices": "Безлимитные кастомные сервисы",
+          "noWatermark": "Без водяного знака",
+          "prioritySupport": "Приоритетная поддержка",
+          "teamAccess": "Командный доступ"
+        }
+      },
+      "business": {
+        "name": "Бизнес",
+        "description": "Для крупных организаций",
+        "cta": "Скоро",
+        "features": {
+          "projects": "Безлимитные проекты",
+          "customServices": "Безлимитные кастомные сервисы",
+          "noWatermark": "Без водяного знака",
+          "teamAccess": "Командный доступ",
+          "apiAccess": "API-доступ"
+        }
+      }
+    }
+  },
+  "apiDocs": {
+    "title": "API Docs | MVP Calculator",
+    "description": "Swagger UI для API проекта MVP Calculator"
+  },
   "dashboard": {
     "greeting": "Добро пожаловать, {name}!",
     "greetingFallback": "Пользователь",
