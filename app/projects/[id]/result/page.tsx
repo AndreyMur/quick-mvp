@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,7 @@ export default function ResultPage({
   const { id } = use(params);
   const router = useRouter();
   const t = useTranslations("result");
+  const format = useFormatter();
   const { name, description, selectedServices, technology, teamRoles } = useProjectBuilder();
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -253,20 +254,20 @@ export default function ResultPage({
               <div>
                 <p className="text-sm text-muted-foreground">{t("cost")}</p>
                 <p className="text-2xl font-bold">
-                  {Math.round(result.total_cost).toLocaleString("ru-RU")}
+                  {format.number(Math.round(result.total_cost))}
                 </p>
                 <p className="text-xs text-muted-foreground">{t("currency")}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{t("manHours")}</p>
-                <p className="text-2xl font-bold">{Math.round(result.total_adjusted_hours)}</p>
+                <p className="text-2xl font-bold">{format.number(Math.round(result.total_adjusted_hours))}</p>
                 <p className="text-xs text-muted-foreground">
-                  {t("base", { hours: Math.round(result.total_base_hours) })}
+                  {t("base", { hours: format.number(Math.round(result.total_base_hours)) })}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">{t("calendarTime")}</p>
-                <p className="text-2xl font-bold">{Math.ceil(result.calendar_days)}</p>
+                <p className="text-2xl font-bold">{format.number(Math.ceil(result.calendar_days))}</p>
                 <p className="text-xs text-muted-foreground">{t("days")}</p>
               </div>
               <div>
@@ -327,9 +328,9 @@ export default function ResultPage({
                       {s.label}
                       {s.is_custom && <Badge className="ml-2" variant="outline">{t("custom")}</Badge>}
                     </TableCell>
-                    <TableCell className="text-right">{Math.round(s.hours)}</TableCell>
+                    <TableCell className="text-right">{format.number(Math.round(s.hours))}</TableCell>
                     <TableCell className="text-right">
-                      {s.cost ? `${Math.round(s.cost)}` : "—"}
+                      {s.cost ? format.number(Math.round(s.cost)) : "—"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -338,7 +339,7 @@ export default function ResultPage({
                     <TableCell className="font-medium">{t("customFixedCosts")}</TableCell>
                     <TableCell className="text-right">—</TableCell>
                     <TableCell className="text-right font-medium">
-                      {Math.round(result.custom_service_fixed_cost)}
+                      {format.number(Math.round(result.custom_service_fixed_cost))}
                     </TableCell>
                   </TableRow>
                 )}
@@ -370,11 +371,16 @@ export default function ResultPage({
                       {r.label}
                       <span className="text-muted-foreground text-xs ml-1">×{r.count}</span>
                     </TableCell>
-                    <TableCell className="text-right">{r.hourly_rate}</TableCell>
-                    <TableCell className="text-right">{Math.round(r.adjusted_hours)}</TableCell>
-                    <TableCell className="text-right">{r.coefficient.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{format.number(r.hourly_rate)}</TableCell>
+                    <TableCell className="text-right">{format.number(Math.round(r.adjusted_hours))}</TableCell>
+                    <TableCell className="text-right">
+                      {format.number(r.coefficient, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </TableCell>
                     <TableCell className="text-right font-medium">
-                      {Math.round(r.cost).toLocaleString("ru-RU")}
+                      {format.number(Math.round(r.cost))}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -398,7 +404,7 @@ export default function ResultPage({
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) =>
-                      `${name} (${percent ? (percent * 100).toFixed(0) : 0}%)`
+                      `${name} (${format.number(percent ? percent * 100 : 0, { maximumFractionDigits: 0 })}%)`
                     }
                     outerRadius={100}
                     fill="#8884d8"
@@ -415,7 +421,7 @@ export default function ResultPage({
                     formatter={(value: unknown) =>
                       typeof value === "number"
                         ? t("currencyTooltip", {
-                            value: Math.round(value).toLocaleString("ru-RU"),
+                            value: format.number(Math.round(value)),
                           })
                         : String(value)
                     }

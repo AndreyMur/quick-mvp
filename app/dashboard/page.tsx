@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const t = useTranslations("dashboard");
   const commonT = useTranslations("common");
+  const format = useFormatter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [limits, setLimits] = useState<Limits | null>(null);
   const [loading, setLoading] = useState(true);
@@ -191,7 +192,7 @@ export default function DashboardPage() {
                   })}
                 </span>
                 <span className="text-sm font-medium">
-                  {Math.round((limits.projects_used / limits.project_limit) * 100)}%
+                  {format.number(Math.round((limits.projects_used / limits.project_limit) * 100))}%
                 </span>
               </div>
               <Progress
@@ -287,7 +288,7 @@ export default function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription>
-                      {new Date(project.created_at).toLocaleDateString("ru-RU", {
+                      {format.dateTime(new Date(project.created_at), {
                         day: "numeric",
                         month: "long",
                         year: "numeric",

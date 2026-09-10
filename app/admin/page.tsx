@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,7 @@ interface TechCoeff { technology_key: string; coefficient: number }
 
 export default function AdminPage() {
   const t = useTranslations("admin");
+  const format = useFormatter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState<User | null>(null);
@@ -251,7 +252,7 @@ export default function AdminPage() {
                         <TableCell>{u.project_limit}</TableCell>
                         <TableCell>{u.project_count}</TableCell>
                         <TableCell>
-                          {new Date(u.created_at).toLocaleDateString("ru-RU")}
+                          {format.dateTime(new Date(u.created_at))}
                         </TableCell>
                         <TableCell>
                           {u.is_admin ? (
