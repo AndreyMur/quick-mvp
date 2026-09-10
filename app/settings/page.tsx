@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,6 +36,7 @@ interface TechCoeff { technology_key: string; coefficient: number }
 export default function SettingsPage() {
   const { profile } = useAuth();
   const t = useTranslations("settings");
+  const format = useFormatter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -507,7 +508,12 @@ export default function SettingsPage() {
                           {tc.technology_key.replace(/_/g, " ")}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Badge>{tc.coefficient.toFixed(2)}</Badge>
+                          <Badge>
+                            {format.number(tc.coefficient, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </Badge>
                         </TableCell>
                       </TableRow>
                     ))}
