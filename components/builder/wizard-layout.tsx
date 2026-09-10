@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,13 @@ import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import Link from "next/link";
 
-const stepLabels = [
-  "Описание",
-  "Сервисы",
-  "Технологии",
-  "Команда",
-  "Саммари",
-];
+const stepKeys = [
+  "description",
+  "services",
+  "technologies",
+  "team",
+  "summary",
+] as const;
 
 interface WizardLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ interface WizardLayoutProps {
 }
 
 export function WizardLayout({ children }: WizardLayoutProps) {
+  const t = useTranslations("builder");
   const {
     currentStep,
     totalSteps,
@@ -30,6 +32,8 @@ export function WizardLayout({ children }: WizardLayoutProps) {
     canProceed,
     setCurrentStep,
   } = useProjectBuilder();
+
+  const stepLabels = stepKeys.map((key) => t(`steps.${key}`));
 
   const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
   const canGoNext = canProceed();
@@ -89,17 +93,17 @@ export function WizardLayout({ children }: WizardLayoutProps) {
           {currentStep > 1 ? (
             <Button variant="outline" onClick={prevStep} className="gap-2">
               <ChevronLeft className="h-4 w-4" />
-              Назад
+              {t("navigation.back")}
             </Button>
           ) : (
             <Link href="/dashboard">
-              <Button variant="outline">Отмена</Button>
+              <Button variant="outline">{t("navigation.cancel")}</Button>
             </Link>
           )}
 
           {currentStep < totalSteps ? (
             <Button onClick={handleNext} disabled={!canGoNext} className="gap-2">
-              Далее
+              {t("navigation.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (

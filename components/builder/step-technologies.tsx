@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const technologies = {
+const technologies: Record<string, { key: string; label?: string }[]> = {
   frontend: [
     { key: "react", label: "React" },
     { key: "vue", label: "Vue" },
@@ -28,7 +29,7 @@ const technologies = {
     { key: "mongodb", label: "MongoDB" },
   ],
   mobile: [
-    { key: "", label: "Не требуется" },
+    { key: "" },
     { key: "react_native", label: "React Native" },
     { key: "flutter", label: "Flutter" },
     { key: "native_ios", label: "Native iOS" },
@@ -37,20 +38,21 @@ const technologies = {
 };
 
 export function StepTechnologies() {
+  const t = useTranslations("builder.technologies");
   const { technology, setTechnology } = useProjectBuilder();
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Технологии</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("title")}</h2>
         <p className="text-muted-foreground">
-          Выберите стек технологий для вашего проекта
+          {t("subtitle")}
         </p>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label>Фронтенд</Label>
+          <Label>{t("frontend")}</Label>
           <Select
             value={technology.frontend}
             onValueChange={(v: string | null) => { if (v) setTechnology("frontend", v); }}
@@ -59,9 +61,9 @@ export function StepTechnologies() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {technologies.frontend.map((t) => (
-                <SelectItem key={t.key} value={t.key}>
-                  {t.label}
+              {technologies.frontend.map((tech) => (
+                <SelectItem key={tech.key} value={tech.key}>
+                  {tech.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -69,7 +71,7 @@ export function StepTechnologies() {
         </div>
 
         <div className="space-y-2">
-          <Label>Бэкенд</Label>
+          <Label>{t("backend")}</Label>
           <Select
             value={technology.backend}
             onValueChange={(v: string | null) => { if (v) setTechnology("backend", v); }}
@@ -78,9 +80,9 @@ export function StepTechnologies() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {technologies.backend.map((t) => (
-                <SelectItem key={t.key} value={t.key}>
-                  {t.label}
+              {technologies.backend.map((tech) => (
+                <SelectItem key={tech.key} value={tech.key}>
+                  {tech.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -88,7 +90,7 @@ export function StepTechnologies() {
         </div>
 
         <div className="space-y-2">
-          <Label>База данных</Label>
+          <Label>{t("database")}</Label>
           <Select
             value={technology.database}
             onValueChange={(v: string | null) => { if (v) setTechnology("database", v); }}
@@ -97,9 +99,9 @@ export function StepTechnologies() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {technologies.database.map((t) => (
-                <SelectItem key={t.key} value={t.key}>
-                  {t.label}
+              {technologies.database.map((tech) => (
+                <SelectItem key={tech.key} value={tech.key}>
+                  {tech.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -107,7 +109,7 @@ export function StepTechnologies() {
         </div>
 
         <div className="space-y-2">
-          <Label>Мобильная разработка</Label>
+          <Label>{t("mobile")}</Label>
           <Select
             value={technology.mobile || "none"}
             onValueChange={(v: string | null) => {
@@ -118,9 +120,9 @@ export function StepTechnologies() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {technologies.mobile.map((t) => (
-                <SelectItem key={t.key || "none"} value={t.key || "none"}>
-                  {t.label}
+              {technologies.mobile.map((tech) => (
+                <SelectItem key={tech.key || "none"} value={tech.key || "none"}>
+                  {tech.label ?? t("none")}
                 </SelectItem>
               ))}
             </SelectContent>

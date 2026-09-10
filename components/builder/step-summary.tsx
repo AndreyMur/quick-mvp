@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,19 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-const serviceLabels: Record<string, string> = {
-  authentication: "Аутентификация",
-  personal_cabinet: "Личный кабинет",
-  payment_system: "Платёжная система",
-  chat_basic: "Чат (базовый)",
-  admin_panel: "Админ-панель",
-  notifications: "Уведомления",
-  file_upload: "Загрузка файлов",
-  analytics: "Аналитика",
-  social_integration: "Интеграция с соцсетями",
-  search: "Поиск",
-};
 
 const techLabels: Record<string, string> = {
   react: "React",
@@ -41,6 +29,7 @@ const techLabels: Record<string, string> = {
 };
 
 export function StepSummary() {
+  const t = useTranslations("builder.summary");
   const {
     name,
     description,
@@ -74,7 +63,7 @@ export function StepSummary() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || "Ошибка при сохранении проекта");
+      throw new Error(err.error || t("errors.saveProject"));
     }
   };
 
@@ -99,14 +88,14 @@ export function StepSummary() {
 
     if (!createRes.ok) {
       const err = await createRes.json().catch(() => ({}));
-      throw new Error(err.error || "Ошибка при создании проекта");
+      throw new Error(err.error || t("errors.createProject"));
     }
 
     const created = await createRes.json();
     const projectId = created.project?.id as string | undefined;
 
     if (!projectId) {
-      throw new Error("Не удалось получить ID проекта");
+      throw new Error(t("errors.noProjectId"));
     }
 
     await saveProjectDraft(projectId);
@@ -128,16 +117,16 @@ export function StepSummary() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при расчёте");
+        toast.error(err.error || t("errors.calculate"));
         return;
       }
 
       const projectId = await ensureProjectId();
-      toast.success("Расчёт выполнен! Переход на страницу результата...");
+      toast.success(t("success"));
       router.push(`/projects/${projectId}/result`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Ошибка при расчёте"
+        error instanceof Error ? error.message : t("errors.calculate")
       );
     } finally {
       setCalculating(false);
@@ -147,9 +136,9 @@ export function StepSummary() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Саммари и расчёт</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("title")}</h2>
         <p className="text-muted-foreground">
-          Проверьте параметры проекта и нажмите «Рассчитать»
+          {t("subtitle")}
         </p>
       </div>
 
@@ -164,43 +153,45 @@ export function StepSummary() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Сервисы</CardTitle>
+          <CardTitle className="text-base">{t("services")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {selectedServices.map((key) => (
               <Badge key={key} variant="secondary">
-                {serviceLabels[key] || key}
+                {t.has(`serviceLabels.${key}`)
+                  ? t(`serviceLabels.${key}`)
+                  : key}
               </Badge>
             ))}
           </div>
           {selectedServices.length === 0 && (
-            <p className="text-sm text-muted-foreground">Не выбрано</p>
+            <p className="text-sm text-muted-foreground">{t("none")}</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Технологии</CardTitle>
+          <CardTitle className="text-base">{t("technologies")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Фронтенд: </span>
+              <span className="text-muted-foreground">{t("frontend")} </span>
               <span>{techLabels[technology.frontend] || technology.frontend}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Бэкенд: </span>
+              <span className="text-muted-foreground">{t("backend")} </span>
               <span>{techLabels[technology.backend] || technology.backend}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">База данных: </span>
+              <span className="text-muted-foreground">{t("database")} </span>
               <span>{techLabels[technology.database] || technology.database}</span>
             </div>
             {technology.mobile && (
               <div>
-                <span className="text-muted-foreground">Мобильная: </span>
+                <span className="text-muted-foreground">{t("mobile")} </span>
                 <span>{techLabels[technology.mobile] || technology.mobile}</span>
               </div>
             )}
@@ -210,7 +201,7 @@ export function StepSummary() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Команда</CardTitle>
+          <CardTitle className="text-base">{t("team")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -224,7 +215,7 @@ export function StepSummary() {
               </div>
             ))}
             {activeRoles.length === 0 && (
-              <p className="text-sm text-muted-foreground">Не выбрано</p>
+              <p className="text-sm text-muted-foreground">{t("none")}</p>
             )}
           </div>
         </CardContent>
@@ -241,10 +232,10 @@ export function StepSummary() {
         {calculating ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Рассчитываем...
+            {t("calculating")}
           </>
         ) : (
-          "Рассчитать"
+          t("calculate")
         )}
       </Button>
     </div>
