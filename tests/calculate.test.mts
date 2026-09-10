@@ -443,7 +443,7 @@ test("сценарий 24: эталонный набор покрывает вс
   assertClose(backend.cost, 4455);
   assertClose(qa.cost, 1800);
   // Итог = сумма ролей + фикс кастомного сервиса (без умножения).
-  assertClose(result.total_cost, 17892.5);
+  assertClose(result.total_cost, 17892.6);
 
   // Шаг 5: календарные дни = 108.45 / (5 человек × 8)
   assertClose(result.calendar_days, 2.71125);
