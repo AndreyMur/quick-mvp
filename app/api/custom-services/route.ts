@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getUserEntitlements } from "@/lib/subscription/entitlements";
 import { z } from "zod";
 
 const customServiceSchema = z.object({
@@ -21,19 +22,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
-  // Check limit
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("custom_services_limit")
-    .eq("id", user.id)
-    .single();
+  // Check limit from the subscription-based entitlements.
+  const entitlements = await getUserEntitlements(supabase, user.id);
 
   const { count } = await supabase
     .from("custom_services")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id);
 
-  const limit = (profile as { custom_services_limit?: number } | null)?.custom_services_limit ?? 2;
+  const limit = entitlements.customServicesLimit;
   if ((count ?? 0) >= limit) {
     return NextResponse.json(
       { error: `Лимит кастомных сервисов (${limit}) исчерпан` },

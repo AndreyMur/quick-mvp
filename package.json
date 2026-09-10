@@ -12,7 +12,8 @@
     "test:e2e:ui": "playwright test --ui",
     "check:encoding": "node scripts/check-encoding.mjs",
     "check:hardcoded": "node scripts/check-hardcoded-strings.mjs",
-    "check": "npm run check:encoding && npm run check:hardcoded"
+    "check": "npm run check:encoding && npm run check:hardcoded",
+    "verify:subscription-rls": "node --env-file=.env.local scripts/verify-subscription-rls.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

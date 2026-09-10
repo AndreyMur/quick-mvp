@@ -3,6 +3,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { createClient } from "@/lib/supabase/server";
 import { exportPdfSchema } from "@/lib/validations/export";
 import { buildReportDocument } from "@/lib/pdf/report";
+import { getUserEntitlements } from "@/lib/subscription/entitlements";
 
 function contentDisposition(name: string): string {
   const base = name || "project";
@@ -20,20 +21,13 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Check subscription tier for watermark (server-side, never trust the client).
-  // Default to the free tier (watermark on) unless the profile explicitly holds
-  // a paid tier, so a missing/unknown tier never silently removes the mark.
-  const PAID_TIERS = new Set(["pro", "business"]);
+  // Determine the watermark from the server-side subscription (never trust the
+  // client). Anonymous callers and users without a paid subscription keep the
+  // watermark.
   let isFree = true;
   if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("subscription_tier")
-      .eq("id", user.id)
-      .single();
-    const tier = (profile as { subscription_tier?: string | null } | null)
-      ?.subscription_tier;
-    isFree = !tier || !PAID_TIERS.has(tier);
+    const entitlements = await getUserEntitlements(supabase, user.id);
+    isFree = entitlements.watermark;
   }
 
   const body = await request.json();
