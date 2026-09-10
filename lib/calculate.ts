@@ -12,6 +12,12 @@ import type {
  */
 export const CALCULATION_VERSION = "2.0.0";
 
+/**
+ * Version assigned to snapshots produced before the algorithm was versioned.
+ * Used when opening legacy saved projects that lack a `version` field.
+ */
+export const LEGACY_CALCULATION_VERSION = "1.0.0";
+
 // Map role keys to display labels
 const ROLE_LABELS: Record<string, string> = {
   project_manager: "Project Manager",
@@ -214,5 +220,92 @@ export function calculateProject(
     roles,
     services,
     custom_service_fixed_cost: customServiceFixedCost,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toFiniteNumber(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+/**
+ * Normalizes a stored calculation snapshot so that projects saved with older
+ * versions of the algorithm can still be opened.
+ *
+ * Legacy snapshots (before v2) have no `version` field and their roles have no
+ * `weight`. This function fills those in with legacy-safe defaults instead of
+ * throwing, and returns `null` for values that are not recognizable as a
+ * calculation result (caller can then fall back to a fresh calculation).
+ */
+export function normalizeCalculationResult(
+  value: unknown
+): CalculationResult | null {
+  if (!isRecord(value)) return null;
+
+  const rawRoles = value.roles;
+  const rawServices = value.services;
+  if (!Array.isArray(rawRoles) || !Array.isArray(rawServices)) return null;
+
+  const roles: RoleCost[] = [];
+  for (const rawRole of rawRoles) {
+    if (!isRecord(rawRole) || typeof rawRole.role !== "string") return null;
+    roles.push({
+      role: rawRole.role,
+      label:
+        typeof rawRole.label === "string" ? rawRole.label : rawRole.role,
+      hourly_rate: toFiniteNumber(rawRole.hourly_rate),
+      base_hours: toFiniteNumber(rawRole.base_hours),
+      coefficient: toFiniteNumber(rawRole.coefficient, 1),
+      adjusted_hours: toFiniteNumber(rawRole.adjusted_hours),
+      cost: toFiniteNumber(rawRole.cost),
+      count: toFiniteNumber(rawRole.count, 1),
+      weight: toFiniteNumber(rawRole.weight, 1),
+    });
+  }
+
+  const services: ServiceCost[] = [];
+  for (const rawService of rawServices) {
+    if (!isRecord(rawService) || typeof rawService.key !== "string") return null;
+    services.push({
+      key: rawService.key,
+      label:
+        typeof rawService.label === "string"
+          ? rawService.label
+          : rawService.key,
+      hours: toFiniteNumber(rawService.hours),
+      cost:
+        typeof rawService.cost === "number" && Number.isFinite(rawService.cost)
+          ? rawService.cost
+          : null,
+      is_custom: rawService.is_custom === true,
+    });
+  }
+
+  const summary = [
+    value.total_base_hours,
+    value.total_adjusted_hours,
+    value.total_cost,
+    value.calendar_days,
+    value.custom_service_fixed_cost,
+  ];
+  if (summary.some((n) => typeof n !== "number" || !Number.isFinite(n))) {
+    return null;
+  }
+
+  return {
+    version:
+      typeof value.version === "string" && value.version.length > 0
+        ? value.version
+        : LEGACY_CALCULATION_VERSION,
+    total_base_hours: value.total_base_hours as number,
+    total_adjusted_hours: value.total_adjusted_hours as number,
+    total_cost: value.total_cost as number,
+    calendar_days: value.calendar_days as number,
+    roles,
+    services,
+    custom_service_fixed_cost: value.custom_service_fixed_cost as number,
   };
 }

@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Save, FileDown, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { normalizeCalculationResult } from "@/lib/calculate";
 import type { CalculationResult, ProjectData } from "@/lib/types/project";
 
 const COLORS = [
@@ -68,10 +69,16 @@ export default function ResultPage({
         const projectData = await projectRes.json();
         const project = projectData.project;
         if (project?.data?.result) {
-          setResult(project.data.result as CalculationResult);
-          setSaved(true);
-          setLoading(false);
-          return;
+          // Snapshots saved by older versions may lack `version`/`weight`.
+          // Normalize them instead of failing; fall back to a fresh
+          // calculation if the stored shape is unrecognizable.
+          const normalized = normalizeCalculationResult(project.data.result);
+          if (normalized) {
+            setResult(normalized);
+            setSaved(true);
+            setLoading(false);
+            return;
+          }
         }
         // Project exists but no calculation yet — use builder state
       }
