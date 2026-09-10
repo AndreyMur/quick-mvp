@@ -1,6 +1,7 @@
 import { z } from "zod";
+import type { CalculateInput } from "@/lib/types/project";
 
-export const calculateInputSchema = z.object({
+export const calculateInputSchema: z.ZodType<CalculateInput> = z.object({
   services: z.array(z.string()).min(1, "Выберите хотя бы один сервис"),
   technologies: z.object({
     frontend: z.string(),
@@ -18,4 +19,4 @@ export const calculateInputSchema = z.object({
     .min(1, "Выберите хотя бы одну роль"),
 });
 
-export type CalculateInput = z.infer<typeof calculateInputSchema>;
+export type { CalculateInput };
