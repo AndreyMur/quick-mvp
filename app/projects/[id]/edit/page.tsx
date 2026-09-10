@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import type { ProjectBuilderState } from "@/lib/stores/project-builder";
 import { WizardLayout } from "@/components/builder/wizard-layout";
@@ -27,6 +28,7 @@ export default function EditProjectPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const t = useTranslations("projects");
   const { currentStep, hydrate } = useProjectBuilder();
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +36,7 @@ export default function EditProjectPage({
     fetch(`/api/projects/${id}`)
       .then((res) => {
         if (!res.ok) {
-          toast.error("Проект не найден");
+          toast.error(t("toasts.notFound"));
           router.push("/dashboard");
           return null;
         }
@@ -61,10 +63,10 @@ export default function EditProjectPage({
         setLoading(false);
       })
       .catch(() => {
-        toast.error("Ошибка при загрузке проекта");
+        toast.error(t("toasts.loadError"));
         router.push("/dashboard");
       });
-  }, [id, hydrate, router]);
+  }, [id, hydrate, router, t]);
 
   if (loading) {
     return (

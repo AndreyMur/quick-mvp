@@ -96,7 +96,7 @@ export default function DashboardPage() {
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: "Новый проект" }),
+        body: JSON.stringify({ name: t("newProjectName") }),
       });
 
       if (!res.ok) {

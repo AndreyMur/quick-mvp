@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,6 +35,7 @@ interface TechCoeff { technology_key: string; coefficient: number }
 
 export default function SettingsPage() {
   const { profile } = useAuth();
+  const t = useTranslations("settings");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -84,11 +86,11 @@ export default function SettingsPage() {
         setTechCoeffs(data.coefficients ?? []);
       }
     } catch {
-      toast.error("Ошибка при загрузке настроек");
+      toast.error(t("toasts.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchData();
@@ -107,12 +109,12 @@ export default function SettingsPage() {
         body: JSON.stringify({ full_name: fullName }),
       });
       if (!res.ok) {
-        toast.error("Ошибка при сохранении");
+        toast.error(t("toasts.saveError"));
         return;
       }
-      toast.success("Профиль обновлён");
+      toast.success(t("toasts.profileSaved"));
     } catch {
-      toast.error("Ошибка при сохранении");
+      toast.error(t("toasts.saveError"));
     }
   };
 
@@ -129,12 +131,12 @@ export default function SettingsPage() {
         }),
       });
       if (!res.ok) {
-        toast.error("Ошибка при сохранении");
+        toast.error(t("toasts.saveError"));
         return;
       }
-      toast.success("Настройки сохранены");
+      toast.success(t("toasts.settingsSaved"));
     } catch {
-      toast.error("Ошибка при сохранении");
+      toast.error(t("toasts.saveError"));
     } finally {
       setSaving(false);
     }
@@ -156,16 +158,18 @@ export default function SettingsPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при сохранении");
+        toast.error(err.error || t("toasts.saveError"));
         return;
       }
 
-      toast.success(editingService ? "Сервис обновлён" : "Сервис создан");
+      toast.success(
+        editingService ? t("toasts.serviceUpdated") : t("toasts.serviceCreated")
+      );
       setEditingService(null);
       setNewService(false);
       fetchData();
     } catch {
-      toast.error("Ошибка при сохранении");
+      toast.error(t("toasts.saveError"));
     }
   };
 
@@ -173,13 +177,13 @@ export default function SettingsPage() {
     try {
       const res = await fetch(`/api/custom-services?id=${id}`, { method: "DELETE" });
       if (!res.ok) {
-        toast.error("Ошибка при удалении");
+        toast.error(t("toasts.deleteError"));
         return;
       }
-      toast.success("Сервис удалён");
+      toast.success(t("toasts.serviceDeleted"));
       fetchData();
     } catch {
-      toast.error("Ошибка при удалении");
+      toast.error(t("toasts.deleteError"));
     }
   };
 
@@ -193,13 +197,13 @@ export default function SettingsPage() {
         body: formData,
       });
       if (!res.ok) {
-        toast.error("Ошибка при загрузке иконки");
+        toast.error(t("toasts.iconUploadError"));
         return null;
       }
       const data = await res.json();
       return data.url;
     } catch {
-      toast.error("Ошибка при загрузке иконки");
+      toast.error(t("toasts.iconUploadError"));
       return null;
     } finally {
       setUploading(false);
@@ -221,29 +225,29 @@ export default function SettingsPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold mb-6">Настройки</h1>
+        <h1 className="text-3xl font-bold mb-6">{t("title")}</h1>
 
         <Tabs defaultValue="profile">
           <TabsList className="mb-6">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
-              Профиль
+              {t("tabs.profile")}
             </TabsTrigger>
             <TabsTrigger value="rates" className="gap-2">
               <DollarSign className="h-4 w-4" />
-              Зарплаты команды
+              {t("tabs.rates")}
             </TabsTrigger>
             <TabsTrigger value="service-hours" className="gap-2">
               <Clock className="h-4 w-4" />
-              Время на сервисы
+              {t("tabs.serviceHours")}
             </TabsTrigger>
             <TabsTrigger value="custom-services" className="gap-2">
               <Plus className="h-4 w-4" />
-              Кастомные сервисы
+              {t("tabs.customServices")}
             </TabsTrigger>
             <TabsTrigger value="coefficients" className="gap-2">
               <Clock className="h-4 w-4" />
-              Коэффициенты
+              {t("tabs.coefficients")}
             </TabsTrigger>
           </TabsList>
 
@@ -251,23 +255,23 @@ export default function SettingsPage() {
           <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <CardTitle>Профиль</CardTitle>
-                <CardDescription>Управление данными аккаунта</CardDescription>
+                <CardTitle>{t("profile.title")}</CardTitle>
+                <CardDescription>{t("profile.description")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Email</Label>
+                  <Label>{t("profile.email")}</Label>
                   <Input value={profile?.email ?? ""} disabled />
                 </div>
                 <div className="space-y-2">
-                  <Label>Отображаемое имя</Label>
+                  <Label>{t("profile.displayName")}</Label>
                   <Input
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Иван Иванов"
+                    placeholder={t("profile.namePlaceholder")}
                   />
                 </div>
-                <Button onClick={handleSaveProfile}>Сохранить</Button>
+                <Button onClick={handleSaveProfile}>{t("profile.save")}</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -276,18 +280,16 @@ export default function SettingsPage() {
           <TabsContent value="rates">
             <Card>
               <CardHeader>
-                <CardTitle>Зарплаты команды</CardTitle>
-                <CardDescription>
-                  Персональные часовые ставки. Если не задано — используется глобальная ставка.
-                </CardDescription>
+                <CardTitle>{t("rates.title")}</CardTitle>
+                <CardDescription>{t("rates.description")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Роль</TableHead>
-                      <TableHead className="text-right">Глобальная ставка</TableHead>
-                      <TableHead className="text-right">Ваша ставка</TableHead>
+                      <TableHead>{t("rates.role")}</TableHead>
+                      <TableHead className="text-right">{t("rates.globalRate")}</TableHead>
+                      <TableHead className="text-right">{t("rates.yourRate")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -333,7 +335,7 @@ export default function SettingsPage() {
                 </Table>
                 <Button onClick={handleSaveRates} className="mt-4" disabled={saving}>
                   {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Сохранить
+                  {t("rates.save")}
                 </Button>
               </CardContent>
             </Card>
@@ -343,18 +345,16 @@ export default function SettingsPage() {
           <TabsContent value="service-hours">
             <Card>
               <CardHeader>
-                <CardTitle>Время на сервисы</CardTitle>
-                <CardDescription>
-                  Персональные нормативы в человеко-часах. Если не задано — используется глобальное значение.
-                </CardDescription>
+                <CardTitle>{t("serviceHours.title")}</CardTitle>
+                <CardDescription>{t("serviceHours.description")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Сервис</TableHead>
-                      <TableHead className="text-right">Глобальные часы</TableHead>
-                      <TableHead className="text-right">Ваши часы</TableHead>
+                      <TableHead>{t("serviceHours.service")}</TableHead>
+                      <TableHead className="text-right">{t("serviceHours.globalHours")}</TableHead>
+                      <TableHead className="text-right">{t("serviceHours.yourHours")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                 </Table>
                 <Button onClick={handleSaveRates} className="mt-4" disabled={saving}>
                   {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Сохранить
+                  {t("serviceHours.save")}
                 </Button>
               </CardContent>
             </Card>
@@ -411,29 +411,29 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>Кастомные сервисы</span>
+                  <span>{t("customServices.title")}</span>
                   <Button onClick={() => setNewService(true)} className="gap-2">
                     <Plus className="h-4 w-4" />
-                    Добавить
+                    {t("customServices.add")}
                   </Button>
                 </CardTitle>
                 <CardDescription>
-                  Сервисы пользователя с возможностью загрузки иконки
+                  {t("customServices.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {customServices.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">
-                    Нет кастомных сервисов
+                    {t("customServices.empty")}
                   </p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Иконка</TableHead>
-                        <TableHead>Название</TableHead>
-                        <TableHead className="text-right">Часы</TableHead>
-                        <TableHead className="text-right">Фикс. стоимость</TableHead>
+                        <TableHead>{t("customServices.icon")}</TableHead>
+                        <TableHead>{t("customServices.name")}</TableHead>
+                        <TableHead className="text-right">{t("customServices.hours")}</TableHead>
+                        <TableHead className="text-right">{t("customServices.fixedCost")}</TableHead>
                         <TableHead className="w-[100px]" />
                       </TableRow>
                     </TableHeader>
@@ -448,7 +448,7 @@ export default function SettingsPage() {
                                 className="h-8 w-8 object-contain"
                               />
                             ) : (
-                              <Badge variant="outline">Нет</Badge>
+                              <Badge variant="outline">{t("customServices.no")}</Badge>
                             )}
                           </TableCell>
                           <TableCell>{cs.name}</TableCell>
@@ -487,17 +487,17 @@ export default function SettingsPage() {
           <TabsContent value="coefficients">
             <Card>
               <CardHeader>
-                <CardTitle>Коэффициенты технологий</CardTitle>
+                <CardTitle>{t("coefficients.title")}</CardTitle>
                 <CardDescription>
-                  Глобальные коэффициенты (только для просмотра)
+                  {t("coefficients.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Технология</TableHead>
-                      <TableHead className="text-right">Коэффициент</TableHead>
+                      <TableHead>{t("coefficients.technology")}</TableHead>
+                      <TableHead className="text-right">{t("coefficients.coefficient")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -549,6 +549,7 @@ function CustomServiceDialog({
   uploading: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("settings.dialog");
   const [name, setName] = useState(service?.name ?? "");
   const [hours, setHours] = useState(String(service?.hours ?? 0));
   const [fixedCost, setFixedCost] = useState(service?.fixed_cost != null ? String(service.fixed_cost) : "");
@@ -566,19 +567,19 @@ function CustomServiceDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {service ? "Редактировать сервис" : "Новый кастомный сервис"}
+            {service ? t("editTitle") : t("newTitle")}
           </DialogTitle>
           <DialogDescription>
-            Укажите параметры сервиса
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Название</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Мой сервис" />
+            <Label>{t("name")}</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} />
           </div>
           <div className="space-y-2">
-            <Label>Часы</Label>
+            <Label>{t("hours")}</Label>
             <Input
               type="number"
               value={hours}
@@ -586,16 +587,16 @@ function CustomServiceDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Фиксированная стоимость (опционально)</Label>
+            <Label>{t("fixedCost")}</Label>
             <Input
               type="number"
               value={fixedCost}
               onChange={(e) => setFixedCost(e.target.value)}
-              placeholder="Оставьте пустым"
+              placeholder={t("fixedCostPlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label>Иконка (PNG, SVG)</Label>
+            <Label>{t("icon")}</Label>
             <div className="flex items-center gap-3">
               {iconUrl && (
                 <img src={iconUrl} alt="icon" className="h-10 w-10 object-contain border rounded" />
@@ -612,7 +613,7 @@ function CustomServiceDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Отмена
+            {t("cancel")}
           </Button>
           <Button
             onClick={() =>
@@ -624,7 +625,7 @@ function CustomServiceDialog({
               })
             }
           >
-            Сохранить
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

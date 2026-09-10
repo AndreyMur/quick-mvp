@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Users } from "lucide-react";
 
 export function StepTeam() {
+  const t = useTranslations("builder.team");
   const { teamRoles, setTeamRoleCount } = useProjectBuilder();
 
   const activeRoles = teamRoles.filter((r) => r.count > 0);
@@ -14,9 +16,9 @@ export function StepTeam() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Состав команды</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("title")}</h2>
         <p className="text-muted-foreground">
-          Укажите количество человек и ставку для каждой роли
+          {t("subtitle")}
         </p>
       </div>
 
@@ -24,7 +26,7 @@ export function StepTeam() {
         <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm">
-            Всего человек: <strong>{totalPeople}</strong>
+            {t("totalPeople")} <strong>{totalPeople}</strong>
           </span>
         </div>
       )}
@@ -46,7 +48,7 @@ export function StepTeam() {
               </Label>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground">Кол-во:</Label>
+                  <Label className="text-xs text-muted-foreground">{t("count")}</Label>
                   <Input
                     type="number"
                     min={0}
@@ -68,7 +70,7 @@ export function StepTeam() {
       </div>
 
       <div className="text-sm text-muted-foreground">
-        Выбрано ролей: {activeRoles.length}, всего человек: {totalPeople}
+        {t("summary", { roles: activeRoles.length, people: totalPeople })}
       </div>
     </div>
   );
