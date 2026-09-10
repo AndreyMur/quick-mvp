@@ -160,6 +160,282 @@
       "createError": "Ошибка при создании проекта",
       "deleteError": "Ошибка при удалении проекта",
       "deleted": "Проект удалён"
+    },
+    "newProjectName": "Новый проект"
+  },
+  "settings": {
+    "title": "Настройки",
+    "tabs": {
+      "profile": "Профиль",
+      "rates": "Зарплаты команды",
+      "serviceHours": "Время на сервисы",
+      "customServices": "Кастомные сервисы",
+      "coefficients": "Коэффициенты"
+    },
+    "profile": {
+      "title": "Профиль",
+      "description": "Управление данными аккаунта",
+      "email": "Email",
+      "displayName": "Отображаемое имя",
+      "namePlaceholder": "Иван Иванов",
+      "save": "Сохранить"
+    },
+    "rates": {
+      "title": "Зарплаты команды",
+      "description": "Персональные часовые ставки. Если не задано — используется глобальная ставка.",
+      "role": "Роль",
+      "globalRate": "Глобальная ставка",
+      "yourRate": "Ваша ставка",
+      "save": "Сохранить"
+    },
+    "serviceHours": {
+      "title": "Время на сервисы",
+      "description": "Персональные нормативы в человеко-часах. Если не задано — используется глобальное значение.",
+      "service": "Сервис",
+      "globalHours": "Глобальные часы",
+      "yourHours": "Ваши часы",
+      "save": "Сохранить"
+    },
+    "customServices": {
+      "title": "Кастомные сервисы",
+      "add": "Добавить",
+      "description": "Сервисы пользователя с возможностью загрузки иконки",
+      "empty": "Нет кастомных сервисов",
+      "icon": "Иконка",
+      "name": "Название",
+      "hours": "Часы",
+      "fixedCost": "Фикс. стоимость",
+      "no": "Нет"
+    },
+    "coefficients": {
+      "title": "Коэффициенты технологий",
+      "description": "Глобальные коэффициенты (только для просмотра)",
+      "technology": "Технология",
+      "coefficient": "Коэффициент"
+    },
+    "dialog": {
+      "editTitle": "Редактировать сервис",
+      "newTitle": "Новый кастомный сервис",
+      "description": "Укажите параметры сервиса",
+      "name": "Название",
+      "namePlaceholder": "Мой сервис",
+      "hours": "Часы",
+      "fixedCost": "Фиксированная стоимость (опционально)",
+      "fixedCostPlaceholder": "Оставьте пустым",
+      "icon": "Иконка (PNG, SVG)",
+      "cancel": "Отмена",
+      "save": "Сохранить"
+    },
+    "toasts": {
+      "loadError": "Ошибка при загрузке настроек",
+      "saveError": "Ошибка при сохранении",
+      "profileSaved": "Профиль обновлён",
+      "settingsSaved": "Настройки сохранены",
+      "serviceUpdated": "Сервис обновлён",
+      "serviceCreated": "Сервис создан",
+      "serviceDeleted": "Сервис удалён",
+      "deleteError": "Ошибка при удалении",
+      "iconUploadError": "Ошибка при загрузке иконки"
+    }
+  },
+  "admin": {
+    "title": "Админ-панель",
+    "tabs": {
+      "users": "Пользователи",
+      "settings": "Глобальные настройки"
+    },
+    "users": {
+      "title": "Управление пользователями",
+      "total": "Всего пользователей: {count}",
+      "email": "Email",
+      "name": "Имя",
+      "tier": "Тариф",
+      "projectLimit": "Лимит проектов",
+      "projects": "Проектов",
+      "createdAt": "Дата регистрации",
+      "isAdmin": "Админ",
+      "adminBadge": "Админ",
+      "edit": "Редактировать",
+      "delete": "Удалить"
+    },
+    "settings": {
+      "ratesTitle": "Ставки команды",
+      "ratesDescription": "Часовая ставка для каждой роли (у.е.)",
+      "role": "Роль",
+      "rate": "Ставка",
+      "hoursTitle": "Нормативы времени на сервисы",
+      "hoursDescription": "Человеко-часы для каждого сервиса",
+      "service": "Сервис",
+      "hours": "Часы",
+      "coeffsTitle": "Коэффициенты технологий",
+      "coeffsDescription": "Коэффициент сложности (по умолчанию 1.0)",
+      "technology": "Технология",
+      "coefficient": "Коэффициент",
+      "saving": "Сохранение...",
+      "save": "Сохранить настройки"
+    },
+    "editDialog": {
+      "title": "Редактировать пользователя",
+      "projectLimit": "Лимит проектов",
+      "tier": "Тариф",
+      "tierFree": "Бесплатный",
+      "tierPro": "Профессиональный",
+      "tierBusiness": "Бизнес",
+      "isAdmin": "Администратор",
+      "cancel": "Отмена",
+      "save": "Сохранить"
+    },
+    "deleteDialog": {
+      "title": "Удалить пользователя?",
+      "description": "Это действие удалит пользователя и все его проекты. Отменить невозможно.",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "toasts": {
+      "accessDenied": "Доступ запрещён",
+      "loadUsersError": "Ошибка при загрузке пользователей",
+      "loadSettingsError": "Ошибка при загрузке настроек",
+      "saveError": "Ошибка при сохранении",
+      "userUpdated": "Пользователь обновлён",
+      "userDeleted": "Пользователь удалён",
+      "deleteError": "Ошибка при удалении",
+      "settingsSaved": "Настройки сохранены"
+    }
+  },
+  "builder": {
+    "steps": {
+      "description": "Описание",
+      "services": "Сервисы",
+      "technologies": "Технологии",
+      "team": "Команда",
+      "summary": "Саммари"
+    },
+    "navigation": {
+      "back": "Назад",
+      "cancel": "Отмена",
+      "next": "Далее"
+    },
+    "description": {
+      "title": "Описание проекта",
+      "subtitle": "Дайте название вашему проекту и добавьте краткое описание",
+      "nameLabel": "Название проекта",
+      "namePlaceholder": "Мой новый проект",
+      "descriptionLabel": "Краткое описание",
+      "descriptionPlaceholder": "Опишите, что должен делать ваш продукт..."
+    },
+    "services": {
+      "title": "Выбор сервисов",
+      "subtitle": "Выберите функциональные модули вашего проекта",
+      "standard": "Стандартные сервисы",
+      "custom": "Кастомные сервисы",
+      "selectedCount": "Выбрано сервисов: {count}",
+      "items": {
+        "authentication": "Аутентификация",
+        "personal_cabinet": "Личный кабинет",
+        "payment_system": "Платежная система",
+        "chat_basic": "Чат (базовый)",
+        "admin_panel": "Админ-панель",
+        "notifications": "Уведомления",
+        "file_upload": "Загрузка файлов",
+        "analytics": "Аналитика",
+        "social_integration": "Интеграция с соцсетями",
+        "search": "Поиск"
+      }
+    },
+    "technologies": {
+      "title": "Технологии",
+      "subtitle": "Выберите стек технологий для вашего проекта",
+      "frontend": "Фронтенд",
+      "backend": "Бэкенд",
+      "database": "База данных",
+      "mobile": "Мобильная разработка",
+      "none": "Не требуется"
+    },
+    "team": {
+      "title": "Состав команды",
+      "subtitle": "Укажите количество человек и ставку для каждой роли",
+      "totalPeople": "Всего человек:",
+      "count": "Кол-во:",
+      "summary": "Выбрано ролей: {roles}, всего человек: {people}"
+    },
+    "summary": {
+      "title": "Саммари и расчёт",
+      "subtitle": "Проверьте параметры проекта и нажмите «Рассчитать»",
+      "services": "Сервисы",
+      "technologies": "Технологии",
+      "team": "Команда",
+      "none": "Не выбрано",
+      "frontend": "Фронтенд:",
+      "backend": "Бэкенд:",
+      "database": "База данных:",
+      "mobile": "Мобильная:",
+      "calculating": "Рассчитываем...",
+      "calculate": "Рассчитать",
+      "success": "Расчёт выполнен! Переход на страницу результата...",
+      "serviceLabels": {
+        "authentication": "Аутентификация",
+        "personal_cabinet": "Личный кабинет",
+        "payment_system": "Платёжная система",
+        "chat_basic": "Чат (базовый)",
+        "admin_panel": "Админ-панель",
+        "notifications": "Уведомления",
+        "file_upload": "Загрузка файлов",
+        "analytics": "Аналитика",
+        "social_integration": "Интеграция с соцсетями",
+        "search": "Поиск"
+      },
+      "errors": {
+        "saveProject": "Ошибка при сохранении проекта",
+        "createProject": "Ошибка при создании проекта",
+        "noProjectId": "Не удалось получить ID проекта",
+        "calculate": "Ошибка при расчёте"
+      }
+    }
+  },
+  "result": {
+    "noData": "Нет данных для отображения",
+    "save": "Сохранить проект",
+    "saved": "Сохранён",
+    "draft": "Черновик",
+    "exportPdf": "Экспорт в PDF",
+    "cost": "Стоимость",
+    "currency": "у.е.",
+    "manHours": "Человеко-часы",
+    "base": "(база: {hours})",
+    "calendarTime": "Календарное время",
+    "days": "дней",
+    "servicesCount": "Сервисов",
+    "technologies": "Технологии",
+    "frontend": "Фронтенд:",
+    "backend": "Бэкенд:",
+    "database": "База данных:",
+    "mobile": "Мобильная:",
+    "services": "Сервисы",
+    "service": "Сервис",
+    "hours": "Часы",
+    "costColumn": "Стоимость",
+    "custom": "Кастомный",
+    "customFixedCosts": "Фиксированные стоимости кастомных",
+    "rolesAndCost": "Роли и стоимость",
+    "role": "Роль",
+    "rate": "Ставка",
+    "coefficient": "Коэфф.",
+    "costDistribution": "Распределение стоимости по ролям",
+    "toDashboard": "На дашборд",
+    "edit": "Редактировать",
+    "currencyTooltip": "{value} у.е.",
+    "toasts": {
+      "calculateError": "Ошибка при расчёте",
+      "saveError": "Ошибка при сохранении проекта",
+      "saved": "Проект сохранён",
+      "pdfError": "Ошибка при генерации PDF",
+      "pdfDownloaded": "PDF скачан"
+    }
+  },
+  "projects": {
+    "toasts": {
+      "notFound": "Проект не найден",
+      "loadError": "Ошибка при загрузке проекта"
     }
   }
 }

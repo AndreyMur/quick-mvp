@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ interface GlobalServiceHour { service_key: string; hours: number; fixed_cost: nu
 interface TechCoeff { technology_key: string; coefficient: number }
 
 export default function AdminPage() {
+  const t = useTranslations("admin");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState<User | null>(null);
@@ -74,26 +76,26 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/users");
       if (!res.ok) {
         if (res.status === 403) {
-          toast.error("Доступ запрещён");
+          toast.error(t("toasts.accessDenied"));
           return;
         }
-        toast.error("Ошибка при загрузке пользователей");
+        toast.error(t("toasts.loadUsersError"));
         return;
       }
       const data = await res.json();
       setUsers(data.users ?? []);
     } catch {
-      toast.error("Ошибка при загрузке пользователей");
+      toast.error(t("toasts.loadUsersError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchSettings = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/settings/global");
       if (!res.ok) {
-        toast.error("Ошибка при загрузке настроек");
+        toast.error(t("toasts.loadSettingsError"));
         return;
       }
       const data = await res.json();
@@ -101,11 +103,11 @@ export default function AdminPage() {
       setGlobalHours(data.global_service_hours ?? []);
       setTechCoeffs(data.technology_coefficients ?? []);
     } catch {
-      toast.error("Ошибка при загрузке настроек");
+      toast.error(t("toasts.loadSettingsError"));
     } finally {
       setSettingsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchUsers();
@@ -126,14 +128,14 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при сохранении");
+        toast.error(err.error || t("toasts.saveError"));
         return;
       }
-      toast.success("Пользователь обновлён");
+      toast.success(t("toasts.userUpdated"));
       setEditUser(null);
       fetchUsers();
     } catch {
-      toast.error("Ошибка при сохранении");
+      toast.error(t("toasts.saveError"));
     }
   };
 
@@ -145,15 +147,15 @@ export default function AdminPage() {
       });
 
       if (!res.ok) {
-        toast.error("Ошибка при удалении");
+        toast.error(t("toasts.deleteError"));
         return;
       }
 
-      toast.success("Пользователь удалён");
+      toast.success(t("toasts.userDeleted"));
       setDeleteUserId(null);
       fetchUsers();
     } catch {
-      toast.error("Ошибка при удалении");
+      toast.error(t("toasts.deleteError"));
     } finally {
       setDeleteUserId(null);
     }
@@ -173,12 +175,12 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при сохранении");
+        toast.error(err.error || t("toasts.saveError"));
         return;
       }
-      toast.success("Настройки сохранены");
+      toast.success(t("toasts.settingsSaved"));
     } catch {
-      toast.error("Ошибка при сохранении");
+      toast.error(t("toasts.saveError"));
     } finally {
       setSavingSettings(false);
     }
@@ -199,17 +201,17 @@ export default function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold mb-6">Админ-панель</h1>
+        <h1 className="text-3xl font-bold mb-6">{t("title")}</h1>
 
         <Tabs defaultValue="users">
           <TabsList className="mb-6">
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
-              Пользователи
+              {t("tabs.users")}
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings2 className="h-4 w-4" />
-              Глобальные настройки
+              {t("tabs.settings")}
             </TabsTrigger>
           </TabsList>
 
@@ -217,22 +219,22 @@ export default function AdminPage() {
           <TabsContent value="users">
             <Card>
               <CardHeader>
-                <CardTitle>Управление пользователями</CardTitle>
+                <CardTitle>{t("users.title")}</CardTitle>
                 <CardDescription>
-                  Всего пользователей: {users.length}
+                  {t("users.total", { count: users.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Имя</TableHead>
-                      <TableHead>Тариф</TableHead>
-                      <TableHead>Лимит проектов</TableHead>
-                      <TableHead>Проектов</TableHead>
-                      <TableHead>Дата регистрации</TableHead>
-                      <TableHead>Админ</TableHead>
+                      <TableHead>{t("users.email")}</TableHead>
+                      <TableHead>{t("users.name")}</TableHead>
+                      <TableHead>{t("users.tier")}</TableHead>
+                      <TableHead>{t("users.projectLimit")}</TableHead>
+                      <TableHead>{t("users.projects")}</TableHead>
+                      <TableHead>{t("users.createdAt")}</TableHead>
+                      <TableHead>{t("users.isAdmin")}</TableHead>
                       <TableHead className="w-[50px]" />
                     </TableRow>
                   </TableHeader>
@@ -253,7 +255,7 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           {u.is_admin ? (
-                            <Badge>Админ</Badge>
+                            <Badge>{t("users.adminBadge")}</Badge>
                           ) : (
                             <span className="text-muted-foreground">—</span>
                           )}
@@ -268,14 +270,14 @@ export default function AdminPage() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => setEditUser(u)}>
                                 <Edit2 className="h-4 w-4 mr-2" />
-                                Редактировать
+                                {t("users.edit")}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setDeleteUserId(u.id)}
                                 className="text-destructive focus:text-destructive"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Удалить
+                                {t("users.delete")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -299,15 +301,15 @@ export default function AdminPage() {
                 {/* Global Rates */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Ставки команды</CardTitle>
-                    <CardDescription>Часовая ставка для каждой роли (у.е.)</CardDescription>
+                    <CardTitle>{t("settings.ratesTitle")}</CardTitle>
+                    <CardDescription>{t("settings.ratesDescription")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Роль</TableHead>
-                          <TableHead className="text-right w-40">Ставка</TableHead>
+                          <TableHead>{t("settings.role")}</TableHead>
+                          <TableHead className="text-right w-40">{t("settings.rate")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -342,15 +344,15 @@ export default function AdminPage() {
                 {/* Service Hours */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Нормативы времени на сервисы</CardTitle>
-                    <CardDescription>Человеко-часы для каждого сервиса</CardDescription>
+                    <CardTitle>{t("settings.hoursTitle")}</CardTitle>
+                    <CardDescription>{t("settings.hoursDescription")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Сервис</TableHead>
-                          <TableHead className="text-right w-40">Часы</TableHead>
+                          <TableHead>{t("settings.service")}</TableHead>
+                          <TableHead className="text-right w-40">{t("settings.hours")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -385,15 +387,15 @@ export default function AdminPage() {
                 {/* Technology Coefficients */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Коэффициенты технологий</CardTitle>
-                    <CardDescription>Коэффициент сложности (по умолчанию 1.0)</CardDescription>
+                    <CardTitle>{t("settings.coeffsTitle")}</CardTitle>
+                    <CardDescription>{t("settings.coeffsDescription")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Технология</TableHead>
-                          <TableHead className="text-right w-40">Коэффициент</TableHead>
+                          <TableHead>{t("settings.technology")}</TableHead>
+                          <TableHead className="text-right w-40">{t("settings.coefficient")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -431,10 +433,10 @@ export default function AdminPage() {
                   {savingSettings ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Сохранение...
+                      {t("settings.saving")}
                     </>
                   ) : (
-                    "Сохранить настройки"
+                    t("settings.save")
                   )}
                 </Button>
               </div>
@@ -446,12 +448,12 @@ export default function AdminPage() {
         <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Редактировать пользователя</DialogTitle>
+              <DialogTitle>{t("editDialog.title")}</DialogTitle>
               <DialogDescription>{editUser?.email}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Лимит проектов</Label>
+                <Label>{t("editDialog.projectLimit")}</Label>
                 <Input
                   type="number"
                   value={editUser?.project_limit ?? 3}
@@ -463,7 +465,7 @@ export default function AdminPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Тариф</Label>
+                <Label>{t("editDialog.tier")}</Label>
                 <Select
                   value={editUser?.subscription_tier ?? "free"}
                   onValueChange={(v: string | null) => {
@@ -474,9 +476,9 @@ export default function AdminPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="free">Бесплатный</SelectItem>
-                    <SelectItem value="pro">Профессиональный</SelectItem>
-                    <SelectItem value="business">Бизнес</SelectItem>
+                    <SelectItem value="free">{t("editDialog.tierFree")}</SelectItem>
+                    <SelectItem value="pro">{t("editDialog.tierPro")}</SelectItem>
+                    <SelectItem value="business">{t("editDialog.tierBusiness")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -491,15 +493,15 @@ export default function AdminPage() {
                   className="h-4 w-4"
                 />
                 <Label htmlFor="is-admin" className="cursor-pointer">
-                  Администратор
+                  {t("editDialog.isAdmin")}
                 </Label>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditUser(null)}>
-                Отмена
+                {t("editDialog.cancel")}
               </Button>
-              <Button onClick={handleSaveUser}>Сохранить</Button>
+              <Button onClick={handleSaveUser}>{t("editDialog.save")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -510,18 +512,18 @@ export default function AdminPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
-                Удалить пользователя?
+                {t("deleteDialog.title")}
               </DialogTitle>
               <DialogDescription>
-                Это действие удалит пользователя и все его проекты. Отменить невозможно.
+                {t("deleteDialog.description")}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDeleteUserId(null)}>
-                Отмена
+                {t("deleteDialog.cancel")}
               </Button>
               <Button variant="destructive" onClick={handleDeleteUser}>
-                Удалить
+                {t("deleteDialog.delete")}
               </Button>
             </DialogFooter>
           </DialogContent>
