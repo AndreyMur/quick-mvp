@@ -170,6 +170,7 @@ export const openApiDocument = {
         properties: {
           role: { type: "string" },
           count: { type: "integer", minimum: 1 },
+          weight: { type: "number", minimum: 0 },
         },
         required: ["role", "count"],
       },
@@ -210,6 +211,7 @@ export const openApiDocument = {
           adjusted_hours: { type: "number" },
           cost: { type: "number" },
           count: { type: "integer" },
+          weight: { type: "number" },
         },
         required: [
           "role",
@@ -220,6 +222,7 @@ export const openApiDocument = {
           "adjusted_hours",
           "cost",
           "count",
+          "weight",
         ],
       },
       CalculationService: {
@@ -236,6 +239,7 @@ export const openApiDocument = {
       CalculationResult: {
         type: "object",
         properties: {
+          version: { type: "string" },
           total_base_hours: { type: "number" },
           total_adjusted_hours: { type: "number" },
           total_cost: { type: "number" },
@@ -251,6 +255,7 @@ export const openApiDocument = {
           custom_service_fixed_cost: { type: "number" },
         },
         required: [
+          "version",
           "total_base_hours",
           "total_adjusted_hours",
           "total_cost",
