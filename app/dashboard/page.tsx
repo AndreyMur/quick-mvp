@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,8 @@ interface Limits {
 export default function DashboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("dashboard");
+  const commonT = useTranslations("common");
   const [projects, setProjects] = useState<Project[]>([]);
   const [limits, setLimits] = useState<Limits | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,11 +74,11 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Ошибка при загрузке данных");
+      toast.error(t("toasts.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -97,14 +100,14 @@ export default function DashboardPage() {
       });
 
       if (!res.ok) {
-        toast.error("Ошибка при создании проекта");
+        toast.error(t("toasts.createError"));
         return;
       }
 
       const data = await res.json();
       router.push(`/projects/${data.project.id}/edit`);
     } catch {
-      toast.error("Ошибка при создании проекта");
+      toast.error(t("toasts.createError"));
     }
   };
 
@@ -117,23 +120,24 @@ export default function DashboardPage() {
       });
 
       if (!res.ok) {
-        toast.error("Ошибка при удалении проекта");
+        toast.error(t("toasts.deleteError"));
         return;
       }
 
-      toast.success("Проект удалён");
+      toast.success(t("toasts.deleted"));
       setProjects((prev) => prev.filter((p) => p.id !== deleteId));
       if (limits) {
         setLimits({ ...limits, projects_used: limits.projects_used - 1 });
       }
     } catch {
-      toast.error("Ошибка при удалении проекта");
+      toast.error(t("toasts.deleteError"));
     } finally {
       setDeleteId(null);
     }
   };
 
-  const greeting = profile?.full_name || user?.email?.split("@")[0] || "Пользователь";
+  const greeting =
+    profile?.full_name || user?.email?.split("@")[0] || t("greetingFallback");
 
   if (loading || authLoading) {
     return (
@@ -161,20 +165,18 @@ export default function DashboardPage() {
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            Добро пожаловать, {greeting}!
+            {t("greeting", { name: greeting })}
           </h1>
-          <p className="text-muted-foreground">
-            Управляйте своими проектами и рассчитывайте стоимость MVP
-          </p>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         {/* Limits & Actions */}
         {limits && (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle className="text-lg">Лимит проектов</CardTitle>
+              <CardTitle className="text-lg">{t("limitsTitle")}</CardTitle>
               <CardDescription>
-                Тариф:{" "}
+                {t("plan")}:{" "}
                 <Badge variant="secondary" className="capitalize">
                   {limits.subscription_tier}
                 </Badge>
@@ -183,7 +185,10 @@ export default function DashboardPage() {
             <CardContent>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-muted-foreground">
-                  Создано {limits.projects_used} из {limits.project_limit}
+                  {t("projectsUsed", {
+                    used: limits.projects_used,
+                    limit: limits.project_limit,
+                  })}
                 </span>
                 <span className="text-sm font-medium">
                   {Math.round((limits.projects_used / limits.project_limit) * 100)}%
@@ -200,12 +205,12 @@ export default function DashboardPage() {
               >
                 <Plus className="h-4 w-4" />
                 {limits.can_create_project
-                  ? "Создать новый проект"
-                  : "Лимит исчерпан"}
+                  ? t("createProject")
+                  : t("limitExhausted")}
               </Button>
               {!limits.can_create_project && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Для создания большего количества проектов перейдите на платный тариф.
+                  {t("limitExhaustedHint")}
                 </p>
               )}
             </CardContent>
@@ -214,17 +219,15 @@ export default function DashboardPage() {
 
         {/* Projects */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Мои проекты</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("projectsTitle")}</h2>
           {projects.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  У вас пока нет проектов
-                </p>
+                <p className="text-muted-foreground mb-4">{t("noProjects")}</p>
                 <Button onClick={handleCreateProject} className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Создать первый проект
+                  {t("createFirstProject")}
                 </Button>
               </CardContent>
             </Card>
@@ -251,7 +254,7 @@ export default function DashboardPage() {
                               }
                             >
                               <FolderOpen className="h-4 w-4 mr-2" />
-                              Открыть результат
+                              {t("actions.openResult")}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
@@ -260,14 +263,14 @@ export default function DashboardPage() {
                             }
                           >
                             <Pencil className="h-4 w-4 mr-2" />
-                            Редактировать
+                            {t("actions.edit")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => setDeleteId(project.id)}
                             className="text-destructive focus:text-destructive"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Удалить
+                            {commonT("delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -277,7 +280,9 @@ export default function DashboardPage() {
                         project.status === "completed" ? "default" : "secondary"
                       }
                     >
-                      {project.status === "completed" ? "Завершён" : "Черновик"}
+                      {project.status === "completed"
+                        ? t("status.completed")
+                        : t("status.draft")}
                     </Badge>
                   </CardHeader>
                   <CardContent>
@@ -301,18 +306,18 @@ export default function DashboardPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
-                Удалить проект?
+                {t("deleteDialog.title")}
               </DialogTitle>
               <DialogDescription>
-                Это действие нельзя отменить. Проект будет удалён навсегда.
+                {t("deleteDialog.description")}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDeleteId(null)}>
-                Отмена
+                {commonT("cancel")}
               </Button>
               <Button variant="destructive" onClick={handleDelete}>
-                Удалить
+                {commonT("delete")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -324,19 +329,21 @@ export default function DashboardPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Crown className="h-5 w-5 text-yellow-500" />
-                Лимит проектов исчерпан
+                {t("limitModal.title")}
               </DialogTitle>
               <DialogDescription>
-                Вы использовали все {limits?.project_limit} доступных проектов бесплатного тарифа.
-                Для создания новых проектов перейдите на платный тариф.
+                {limits &&
+                  t("limitModal.description", {
+                    limit: limits.project_limit,
+                  })}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowLimitModal(false)}>
-                Позже
+                {t("limitModal.later")}
               </Button>
               <Link href="/pricing">
-                <Button>Перейти на платный тариф</Button>
+                <Button>{t("limitModal.upgrade")}</Button>
               </Link>
             </DialogFooter>
           </DialogContent>
