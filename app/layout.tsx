@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AuthProvider>{children}</AuthProvider>
+            <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
