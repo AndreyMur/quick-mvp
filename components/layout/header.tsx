@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Button } from "@/components/ui/button";
@@ -19,19 +20,20 @@ import {
 import { useState } from "react";
 import { useTheme } from "next-themes";
 
-const navLinks = [
-  { href: "/dashboard", label: "Дашборд", icon: LayoutDashboard },
-  { href: "/settings", label: "Настройки", icon: Settings },
-  { href: "/pricing", label: "Тарифы", icon: Store },
-];
-
 export function Header() {
   const { user, profile, loading } = useAuth();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("header");
 
   const isAdmin = profile?.is_admin ?? false;
+
+  const navLinks = [
+    { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/settings", label: t("settings"), icon: Settings },
+    { href: "/pricing", label: t("pricing"), icon: Store },
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -67,7 +69,7 @@ export function Header() {
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Shield className="h-4 w-4" />
-              Админ
+              {t("admin")}
             </Link>
           )}
         </nav>
@@ -80,7 +82,7 @@ export function Header() {
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Переключить тему</span>
+            <span className="sr-only">{t("toggleTheme")}</span>
           </Button>
 
           {loading ? (
@@ -91,7 +93,7 @@ export function Header() {
             </div>
           ) : (
             <Link href="/login" className="hidden md:block">
-              <Button>Войти</Button>
+              <Button>{t("login")}</Button>
             </Link>
           )}
 
@@ -138,12 +140,12 @@ export function Header() {
               className="flex items-center gap-3 text-sm text-muted-foreground"
             >
               <Shield className="h-4 w-4" />
-              Админ-панель
+              {t("adminPanel")}
             </Link>
           )}
           {!loading && !user && (
             <Link href="/login" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full">Войти</Button>
+              <Button className="w-full">{t("login")}</Button>
             </Link>
           )}
           {!loading && user && <SignOutButton />}

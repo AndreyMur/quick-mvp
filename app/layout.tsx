@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/layout/theme-provider";
@@ -15,10 +16,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "cyrillic"],
 });
 
-export const metadata: Metadata = {
-  title: "MVP Calculator",
-  description: "Рассчитайте стоимость и сроки создания MVP за 5 минут",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default function RootLayout({
   children,
