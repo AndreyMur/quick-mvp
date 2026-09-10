@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useProjectBuilder } from "@/lib/stores/project-builder";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export default function ResultPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const t = useTranslations("result");
   const { name, description, selectedServices, technology, teamRoles } = useProjectBuilder();
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,18 +88,18 @@ export default function ResultPage({
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error || "Ошибка при расчёте");
+        toast.error(err.error || t("toasts.calculateError"));
         return;
       }
 
       const data = await res.json();
       setResult(data.result);
     } catch {
-      toast.error("Ошибка при расчёте");
+      toast.error(t("toasts.calculateError"));
     } finally {
       setLoading(false);
     }
-  }, [selectedServices, technology, teamRoles, id]);
+  }, [selectedServices, technology, teamRoles, id, t]);
 
   useEffect(() => {
     calculate();
@@ -130,14 +132,14 @@ export default function ResultPage({
       });
 
       if (!res.ok) {
-        toast.error("Ошибка при сохранении проекта");
+        toast.error(t("toasts.saveError"));
         return;
       }
 
-      toast.success("Проект сохранён");
+      toast.success(t("toasts.saved"));
       setSaved(true);
     } catch {
-      toast.error("Ошибка при сохранении проекта");
+      toast.error(t("toasts.saveError"));
     } finally {
       setSaving(false);
     }
@@ -158,7 +160,7 @@ export default function ResultPage({
       });
 
       if (!res.ok) {
-        toast.error("Ошибка при генерации PDF");
+        toast.error(t("toasts.pdfError"));
         return;
       }
 
@@ -172,9 +174,9 @@ export default function ResultPage({
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success("PDF скачан");
+      toast.success(t("toasts.pdfDownloaded"));
     } catch {
-      toast.error("Ошибка при генерации PDF");
+      toast.error(t("toasts.pdfError"));
     } finally {
       setExporting(false);
     }
@@ -196,7 +198,7 @@ export default function ResultPage({
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Нет данных для отображения</p>
+          <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       </div>
     );
@@ -221,7 +223,7 @@ export default function ResultPage({
             ) : (
               <Save className="h-4 w-4" />
             )}
-            {saved ? "Сохранён" : "Сохранить проект"}
+            {saved ? t("saved") : t("save")}
           </Button>
           <Button variant="outline" onClick={handleExportPdf} disabled={exporting} className="gap-2">
             {exporting ? (
@@ -229,11 +231,11 @@ export default function ResultPage({
             ) : (
               <FileDown className="h-4 w-4" />
             )}
-            Экспорт в PDF
+            {t("exportPdf")}
           </Button>
           <div className="ml-auto">
             <Badge variant={saved ? "default" : "secondary"}>
-              {saved ? "Сохранён" : "Черновик"}
+              {saved ? t("saved") : t("draft")}
             </Badge>
           </div>
         </div>
@@ -249,26 +251,26 @@ export default function ResultPage({
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Стоимость</p>
+                <p className="text-sm text-muted-foreground">{t("cost")}</p>
                 <p className="text-2xl font-bold">
                   {Math.round(result.total_cost).toLocaleString("ru-RU")}
                 </p>
-                <p className="text-xs text-muted-foreground">у.е.</p>
+                <p className="text-xs text-muted-foreground">{t("currency")}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Человеко-часы</p>
+                <p className="text-sm text-muted-foreground">{t("manHours")}</p>
                 <p className="text-2xl font-bold">{Math.round(result.total_adjusted_hours)}</p>
                 <p className="text-xs text-muted-foreground">
-                  (база: {Math.round(result.total_base_hours)})
+                  {t("base", { hours: Math.round(result.total_base_hours) })}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Календарное время</p>
+                <p className="text-sm text-muted-foreground">{t("calendarTime")}</p>
                 <p className="text-2xl font-bold">{Math.ceil(result.calendar_days)}</p>
-                <p className="text-xs text-muted-foreground">дней</p>
+                <p className="text-xs text-muted-foreground">{t("days")}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Сервисов</p>
+                <p className="text-sm text-muted-foreground">{t("servicesCount")}</p>
                 <p className="text-2xl font-bold">{result.services.length}</p>
               </div>
             </div>
@@ -278,25 +280,25 @@ export default function ResultPage({
         {/* Technologies */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-base">Технологии</CardTitle>
+            <CardTitle className="text-base">{t("technologies")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div>
-                <span className="text-muted-foreground">Фронтенд: </span>
+                <span className="text-muted-foreground">{t("frontend")} </span>
                 <span className="font-medium">{TECH_LABELS[technology.frontend] || technology.frontend}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Бэкенд: </span>
+                <span className="text-muted-foreground">{t("backend")} </span>
                 <span className="font-medium">{TECH_LABELS[technology.backend] || technology.backend}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">База данных: </span>
+                <span className="text-muted-foreground">{t("database")} </span>
                 <span className="font-medium">{TECH_LABELS[technology.database] || technology.database}</span>
               </div>
               {technology.mobile && (
                 <div>
-                  <span className="text-muted-foreground">Мобильная: </span>
+                  <span className="text-muted-foreground">{t("mobile")} </span>
                   <span className="font-medium">{TECH_LABELS[technology.mobile] || technology.mobile}</span>
                 </div>
               )}
@@ -307,15 +309,15 @@ export default function ResultPage({
         {/* Services table */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-base">Сервисы</CardTitle>
+            <CardTitle className="text-base">{t("services")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Сервис</TableHead>
-                  <TableHead className="text-right">Часы</TableHead>
-                  <TableHead className="text-right">Стоимость</TableHead>
+                  <TableHead>{t("service")}</TableHead>
+                  <TableHead className="text-right">{t("hours")}</TableHead>
+                  <TableHead className="text-right">{t("costColumn")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -323,7 +325,7 @@ export default function ResultPage({
                   <TableRow key={s.key}>
                     <TableCell>
                       {s.label}
-                      {s.is_custom && <Badge className="ml-2" variant="outline">Кастомный</Badge>}
+                      {s.is_custom && <Badge className="ml-2" variant="outline">{t("custom")}</Badge>}
                     </TableCell>
                     <TableCell className="text-right">{Math.round(s.hours)}</TableCell>
                     <TableCell className="text-right">
@@ -333,7 +335,7 @@ export default function ResultPage({
                 ))}
                 {result.custom_service_fixed_cost > 0 && (
                   <TableRow>
-                    <TableCell className="font-medium">Фиксированные стоимости кастомных</TableCell>
+                    <TableCell className="font-medium">{t("customFixedCosts")}</TableCell>
                     <TableCell className="text-right">—</TableCell>
                     <TableCell className="text-right font-medium">
                       {Math.round(result.custom_service_fixed_cost)}
@@ -348,17 +350,17 @@ export default function ResultPage({
         {/* Roles table */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-base">Роли и стоимость</CardTitle>
+            <CardTitle className="text-base">{t("rolesAndCost")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Роль</TableHead>
-                  <TableHead className="text-right">Ставка</TableHead>
-                  <TableHead className="text-right">Часы</TableHead>
-                  <TableHead className="text-right">Коэфф.</TableHead>
-                  <TableHead className="text-right">Стоимость</TableHead>
+                  <TableHead>{t("role")}</TableHead>
+                  <TableHead className="text-right">{t("rate")}</TableHead>
+                  <TableHead className="text-right">{t("hours")}</TableHead>
+                  <TableHead className="text-right">{t("coefficient")}</TableHead>
+                  <TableHead className="text-right">{t("costColumn")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -385,7 +387,7 @@ export default function ResultPage({
         {pieData.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle className="text-base">Распределение стоимости по ролям</CardTitle>
+              <CardTitle className="text-base">{t("costDistribution")}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -412,7 +414,9 @@ export default function ResultPage({
                   <Tooltip
                     formatter={(value: unknown) =>
                       typeof value === "number"
-                        ? `${Math.round(value).toLocaleString("ru-RU")} у.е.`
+                        ? t("currencyTooltip", {
+                            value: Math.round(value).toLocaleString("ru-RU"),
+                          })
                         : String(value)
                     }
                   />
@@ -427,10 +431,10 @@ export default function ResultPage({
 
         <div className="flex justify-between">
           <Button variant="outline" onClick={() => router.push("/dashboard")}>
-            На дашборд
+            {t("toDashboard")}
           </Button>
           <Button onClick={() => router.push(`/projects/${id}/edit`)}>
-            Редактировать
+            {t("edit")}
           </Button>
         </div>
       </main>
