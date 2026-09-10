@@ -114,8 +114,10 @@ export const openApiDocument = {
           name: { type: "string" },
           description: { type: ["string", "null"] },
           data: {
-            type: "object",
-            additionalProperties: true,
+            oneOf: [
+              { $ref: "#/components/schemas/ProjectData" },
+              { type: "null" },
+            ],
           },
           status: {
             type: "string",
@@ -159,8 +161,10 @@ export const openApiDocument = {
             enum: ["draft", "completed"],
           },
           data: {
-            type: "object",
-            additionalProperties: true,
+            oneOf: [
+              { $ref: "#/components/schemas/ProjectData" },
+              { type: "null" },
+            ],
           },
         },
         additionalProperties: false,
@@ -211,7 +215,11 @@ export const openApiDocument = {
           adjusted_hours: { type: "number" },
           cost: { type: "number" },
           count: { type: "integer" },
-          weight: { type: "number" },
+          weight: {
+            type: "number",
+            description:
+              "Вес роли при распределении часов. В снапшотах старого формата отсутствует (трактуется как 1).",
+          },
         },
         required: [
           "role",
@@ -222,7 +230,6 @@ export const openApiDocument = {
           "adjusted_hours",
           "cost",
           "count",
-          "weight",
         ],
       },
       CalculationService: {
@@ -239,7 +246,11 @@ export const openApiDocument = {
       CalculationResult: {
         type: "object",
         properties: {
-          version: { type: "string" },
+          version: {
+            type: "string",
+            description:
+              "Версия алгоритма расчёта. В снапшотах старого формата может отсутствовать; клиент трактует это как legacy-версию.",
+          },
           total_base_hours: { type: "number" },
           total_adjusted_hours: { type: "number" },
           total_cost: { type: "number" },
@@ -255,7 +266,6 @@ export const openApiDocument = {
           custom_service_fixed_cost: { type: "number" },
         },
         required: [
-          "version",
           "total_base_hours",
           "total_adjusted_hours",
           "total_cost",
@@ -264,6 +274,43 @@ export const openApiDocument = {
           "services",
           "custom_service_fixed_cost",
         ],
+      },
+      ProjectData: {
+        type: "object",
+        description:
+          "Содержимое поля `data` проекта: параметры конструктора и сохранённый снапшот расчёта.",
+        properties: {
+          name: { type: "string" },
+          description: { type: "string" },
+          selectedServices: {
+            type: "array",
+            items: { type: "string" },
+          },
+          technology: {
+            type: "object",
+            properties: {
+              frontend: { type: "string" },
+              backend: { type: "string" },
+              database: { type: "string" },
+              mobile: { type: "string" },
+            },
+          },
+          teamRoles: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                role: { type: "string" },
+                label: { type: "string" },
+                count: { type: "integer" },
+                weight: { type: "number" },
+              },
+              required: ["role", "label", "count"],
+            },
+          },
+          result: { $ref: "#/components/schemas/CalculationResult" },
+        },
+        additionalProperties: true,
       },
       UserRate: {
         type: "object",
