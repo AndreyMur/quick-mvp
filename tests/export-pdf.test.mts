@@ -332,3 +332,46 @@ test("шаблон: длинный отчёт разбивается на 2+ с�
   assert.ok(pages >= 2, `ожидалось 2+ страницы, получено ${pages}`);
 });
 
+// --- performance (phase 19, #59) ---
+
+test("производительность: генерация реального отчёта укладывается в 5 секунд (#59)", async () => {
+  const realistic: CalculationResult = {
+    ...sampleResult,
+    roles: Array.from({ length: 8 }, (_, i) => {
+      const hourly_rate = 1000 + i * 250;
+      const adjusted_hours = 20 + i * 3;
+      return {
+        ...sampleResult.roles[0],
+        role: `role_${i}`,
+        label: `Роль ${i + 1}`,
+        hourly_rate,
+        adjusted_hours,
+        cost: hourly_rate * adjusted_hours,
+      };
+    }),
+    services: Array.from({ length: 10 }, (_, i) => ({
+      key: `service_${i}`,
+      label: `Сервис ${i + 1}`,
+      hours: 12 + i,
+      cost: i % 2 === 0 ? null : 15000 + i * 1000,
+      is_custom: i % 2 !== 0,
+    })),
+  };
+
+  const started = performance.now();
+  const buffer = await renderToBuffer(
+    buildReportDocument({
+      project: { name: "Реальный проект", description: "Описание" },
+      result: realistic,
+      isFree: true,
+    })
+  );
+  const elapsed = performance.now() - started;
+
+  assert.ok(buffer.length > 1000, "PDF не должен быть пустым");
+  assert.ok(
+    elapsed <= 5000,
+    `генерация заняла ${Math.round(elapsed)} мс, лимит 5000 мс`
+  );
+});
+
