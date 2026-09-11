@@ -7,7 +7,7 @@
  *
  * Register it through `tests/register-loader.mjs` (see the `npm test` script).
  */
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { dirname, resolve as resolvePath } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -16,14 +16,18 @@ const PROJECT_ROOT = resolvePath(dirname(fileURLToPath(import.meta.url)), "..");
 const EXTENSIONS = [".ts", ".tsx", ".mts", ".mjs", ".js"];
 const INDEX_FILES = EXTENSIONS.map((ext) => `index${ext}`);
 
+function isFile(candidate) {
+  return existsSync(candidate) && statSync(candidate).isFile();
+}
+
 function resolveFile(base) {
   const candidates = [base, ...EXTENSIONS.map((ext) => `${base}${ext}`)];
   for (const candidate of candidates) {
-    if (existsSync(candidate)) return candidate;
+    if (isFile(candidate)) return candidate;
   }
   for (const index of INDEX_FILES) {
     const candidate = resolvePath(base, index);
-    if (existsSync(candidate)) return candidate;
+    if (isFile(candidate)) return candidate;
   }
   return null;
 }

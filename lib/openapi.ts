@@ -41,6 +41,7 @@ export const openApiDocument = {
     { name: "Settings", description: "Настройки пользователя" },
     { name: "Custom Services", description: "Кастомные сервисы" },
     { name: "User", description: "Профиль, лимиты и подписка" },
+    { name: "Payments", description: "Оплата тарифов и webhook провайдера" },
     { name: "Reference", description: "Справочные данные" },
     { name: "Export", description: "Экспорт результата" },
   ],
@@ -456,6 +457,22 @@ export const openApiDocument = {
           "cancel_at_period_end",
           "provider",
         ],
+      },
+      CheckoutRequest: {
+        type: "object",
+        properties: {
+          plan: { type: "string", enum: ["pro", "business"] },
+        },
+        required: ["plan"],
+        additionalProperties: false,
+      },
+      CheckoutSession: {
+        type: "object",
+        properties: {
+          url: { type: "string", format: "uri" },
+          session_id: { type: "string" },
+        },
+        required: ["url", "session_id"],
       },
       ExportPdfRequest: {
         type: "object",
@@ -1004,6 +1021,80 @@ export const openApiDocument = {
           "401": errorResponse("Не авторизован", { error: "Не авторизован" }),
           "500": errorResponse("Ошибка загрузки статуса подписки", {
             error: "Ошибка при загрузке статуса подписки",
+          }),
+        },
+      },
+    },
+    "/api/subscription/checkout": {
+      post: {
+        tags: ["Payments"],
+        summary: "Создать платёжную сессию для платного тарифа",
+        description:
+          "Создаёт checkout-сессию платёжного провайдера (Stripe, тестовый " +
+          "режим) для тарифов pro (99) или business (299). Возвращает URL " +
+          "для перехода на оплату. Повторная оплата уже активного тарифа " +
+          "отклоняется (409).",
+        security: [{ SupabaseSessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: jsonContent({
+            $ref: "#/components/schemas/CheckoutRequest",
+          }),
+        },
+        responses: {
+          "200": {
+            description: "Платёжная сессия создана",
+            content: jsonContent({
+              $ref: "#/components/schemas/CheckoutSession",
+            }),
+          },
+          "400": {
+            description: "Некорректные данные",
+            content: jsonContent({
+              $ref: "#/components/schemas/ValidationError",
+            }),
+          },
+          "401": errorResponse("Не авторизован", { error: "Не авторизован" }),
+          "409": errorResponse("Тариф уже активен", {
+            error: "Этот тариф уже активен",
+          }),
+          "503": errorResponse("Провайдер не настроен", {
+            error: "Платёжный провайдер не настроен",
+          }),
+          "500": errorResponse("Ошибка создания сессии", {
+            error: "Ошибка при создании платёжной сессии",
+          }),
+        },
+      },
+    },
+    "/api/webhooks/stripe": {
+      post: {
+        tags: ["Payments"],
+        summary: "Webhook платёжного провайдера",
+        description:
+          "Принимает события подписки Stripe. Проверяет подпись заголовка " +
+          "stripe-signature и обрабатывает события идемпотентно по event.id. " +
+          "Вызывается провайдером; авторизация — подпись запроса.",
+        responses: {
+          "200": {
+            description: "Событие принято",
+            content: jsonContent({
+              type: "object",
+              properties: {
+                received: { type: "boolean" },
+                status: { type: "string" },
+              },
+              required: ["received", "status"],
+            }),
+          },
+          "400": errorResponse("Неверная подпись", {
+            error: "Неверная подпись",
+          }),
+          "503": errorResponse("Провайдер не настроен", {
+            error: "Платёжный провайдер не настроен",
+          }),
+          "500": errorResponse("Ошибка обработки", {
+            error: "Ошибка обработки webhook",
           }),
         },
       },

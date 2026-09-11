@@ -88,6 +88,38 @@ export type Database = {
           updated_at?: string;
         };
       };
+      payment_events: {
+        Row: {
+          id: string;
+          provider: string;
+          event_id: string;
+          type: string | null;
+          user_id: string | null;
+          payload: Json | null;
+          processed_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider: string;
+          event_id: string;
+          type?: string | null;
+          user_id?: string | null;
+          payload?: Json | null;
+          processed_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider?: string;
+          event_id?: string;
+          type?: string | null;
+          user_id?: string | null;
+          payload?: Json | null;
+          processed_at?: string;
+          created_at?: string;
+        };
+      };
       projects: {
         Row: {
           id: string;
