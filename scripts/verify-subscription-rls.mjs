@@ -1,8 +1,10 @@
 /**
- * Live RLS verification for the subscriptions table (phase 21, #62).
+ * Live RLS verification for the subscriptions and payment_events tables
+ * (phase 21, #62; phase 24, #74).
  *
- * Requires the `003_subscriptions.sql` migration to be applied and the
- * following environment variables (loaded from `.env.local`):
+ * Requires the `003_subscriptions.sql` and `004_payment_events.sql`
+ * migrations to be applied and the following environment variables (loaded
+ * from `.env.local`):
  *   - NEXT_PUBLIC_SUPABASE_URL
  *   - NEXT_PUBLIC_SUPABASE_ANON_KEY
  *   - SUPABASE_SERVICE_ROLE_KEY
@@ -11,10 +13,11 @@
  *   node --env-file=.env.local scripts/verify-subscription-rls.mjs
  *
  * It creates two temporary users (a regular user and an administrator),
- * gives each a subscription, then signs in as each of them and checks that:
- *   - the user sees only their own subscription;
- *   - the administrator sees every subscription.
- * Temporary users are removed afterwards.
+ * gives each a subscription and seeds one payment event, then signs in as each
+ * of them and checks that:
+ *   - the user sees only their own subscription and no payment events;
+ *   - the administrator sees every subscription and the payment event.
+ * Temporary users and the seeded event are removed afterwards.
  */
 import { createClient } from "@supabase/supabase-js";
 
@@ -66,6 +69,7 @@ async function signIn(email) {
 
 let user;
 let adminUser;
+let eventId;
 
 try {
   user = await createUser(USER_EMAIL);
@@ -85,6 +89,16 @@ try {
     { onConflict: "user_id" }
   );
   if (seedError) throw seedError;
+
+  // Service role bypasses RLS: seed one payment event owned by the user.
+  eventId = `evt_rls_${stamp}`;
+  const { error: eventSeedError } = await admin.from("payment_events").insert({
+    provider: "stripe",
+    event_id: eventId,
+    type: "checkout.session.completed",
+    user_id: user.id,
+  });
+  if (eventSeedError) throw eventSeedError;
 
   const userClient = await signIn(USER_EMAIL);
   const { data: userRows, error: userError } = await userClient
@@ -111,13 +125,41 @@ try {
     );
   }
 
+  // payment_events: regular users have no read policy, admins see everything.
+  const { data: userEvents, error: userEventsError } = await userClient
+    .from("payment_events")
+    .select("event_id");
+  if (userEventsError) throw userEventsError;
+
+  if (userEvents.length !== 0) {
+    throw new Error(
+      `RLS: пользователь не должен видеть журнал платежей, видит ${userEvents.length}`
+    );
+  }
+
+  const { data: adminEvents, error: adminEventsError } = await adminClient
+    .from("payment_events")
+    .select("event_id");
+  if (adminEventsError) throw adminEventsError;
+
+  if (!adminEvents.some((row) => row.event_id === eventId)) {
+    throw new Error("RLS: администратор должен видеть журнал платежей");
+  }
+
   console.log(
-    "OK: RLS подписки — пользователь видит только свою запись, администратор — все"
+    "OK: RLS подписки и журнала платежей — пользователь видит только свою запись и не видит событий, администратор — все"
   );
 } catch (error) {
   console.error("FAIL:", error.message ?? error);
   process.exitCode = 1;
 } finally {
+  if (eventId) {
+    try {
+      await admin.from("payment_events").delete().eq("event_id", eventId);
+    } catch {
+      // Таблица могла не примениться — это не должно скрывать результат проверки.
+    }
+  }
   if (user) await admin.auth.admin.deleteUser(user.id).catch(() => {});
   if (adminUser) await admin.auth.admin.deleteUser(adminUser.id).catch(() => {});
 }
