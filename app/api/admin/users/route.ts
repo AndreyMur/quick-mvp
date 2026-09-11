@@ -99,6 +99,21 @@ export async function PUT(request: NextRequest) {
   if (validation.data.is_admin !== undefined) updateData.is_admin = validation.data.is_admin;
   if (validation.data.subscription_tier !== undefined) updateData.subscription_tier = validation.data.subscription_tier;
 
+  // Keep the subscription record (source of truth for entitlements) in sync
+  // with a manual tier change made by an administrator.
+  if (validation.data.subscription_tier !== undefined) {
+    await supabase
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: targetUserId,
+          plan: validation.data.subscription_tier,
+          status: "active",
+        } as never,
+        { onConflict: "user_id" }
+      );
+  }
+
   const { data: profile, error } = await supabase
     .from("profiles")
     .update(updateData as never)

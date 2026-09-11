@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import {
+  canCreateWithinLimit,
+  getUserEntitlements,
+} from "@/lib/subscription/entitlements";
 
 export async function GET() {
   const supabase = await createClient();
@@ -13,19 +17,7 @@ export async function GET() {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("subscription_tier, project_limit, custom_services_limit")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError) {
-    console.error("Error fetching profile:", profileError);
-    return NextResponse.json(
-      { error: "Ошибка при загрузке профиля" },
-      { status: 500 }
-    );
-  }
+  const entitlements = await getUserEntitlements(supabase, user.id);
 
   const { count: projectsCount, error: projectsError } = await supabase
     .from("projects")
@@ -40,20 +32,17 @@ export async function GET() {
     );
   }
 
-  const limits = profile as unknown as {
-    subscription_tier: string;
-    project_limit: number;
-    custom_services_limit: number;
-  };
-
   const projectsUsed = projectsCount ?? 0;
-  const canCreateProject = projectsUsed < (limits.project_limit ?? 3);
 
   return NextResponse.json({
-    subscription_tier: limits.subscription_tier,
-    project_limit: limits.project_limit,
-    custom_services_limit: limits.custom_services_limit,
+    subscription_tier: entitlements.tier,
+    project_limit: entitlements.projectLimit,
+    custom_services_limit: entitlements.customServicesLimit,
+    watermark: entitlements.watermark,
     projects_used: projectsUsed,
-    can_create_project: canCreateProject,
+    can_create_project: canCreateWithinLimit(
+      projectsUsed,
+      entitlements.projectLimit
+    ),
   });
 }

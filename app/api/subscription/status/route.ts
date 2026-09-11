@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getUserSubscription } from "@/lib/subscription/entitlements";
 
 export async function GET() {
   const supabase = await createClient();
@@ -13,29 +14,16 @@ export async function GET() {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("subscription_tier, project_limit, custom_services_limit")
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    console.error("Error fetching subscription:", error);
-    return NextResponse.json(
-      { error: "Ошибка при загрузке статуса подписки" },
-      { status: 500 }
-    );
-  }
-
-  const p = profile as {
-    subscription_tier: string;
-    project_limit: number;
-    custom_services_limit: number;
-  } | null;
+  const subscription = await getUserSubscription(supabase, user.id);
 
   return NextResponse.json({
-    subscription_tier: p?.subscription_tier ?? "free",
-    project_limit: p?.project_limit ?? 3,
-    custom_services_limit: p?.custom_services_limit ?? 2,
+    subscription_tier: subscription.plan,
+    status: subscription.status,
+    project_limit: subscription.entitlements.projectLimit,
+    custom_services_limit: subscription.entitlements.customServicesLimit,
+    watermark: subscription.entitlements.watermark,
+    current_period_end: subscription.currentPeriodEnd,
+    cancel_at_period_end: subscription.cancelAtPeriodEnd,
+    provider: subscription.provider,
   });
 }
